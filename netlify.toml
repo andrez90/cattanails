@@ -1,0 +1,6 @@
+[build]
+  publish = "sitio"
+  # Sin comando de build: la carpeta sitio/ ya está generada.
+
+[build.processing]
+  skip_processing = false
