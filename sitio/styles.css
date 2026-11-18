@@ -472,6 +472,15 @@ details[open]>p{animation:stepin .32s ease-out}
 .cinfo{display:inline-block;margin:0 0 16px;padding:8px 14px;border-radius:12px;border:1px solid var(--acad-gold);color:var(--acad-fg);font-weight:600;font-size:14.5px}
 .hor{margin-top:8px!important;font-weight:600}
 
+/* ===== Último paso: avisar a Pilar por WhatsApp ===== */
+.wastep{margin:22px auto 8px;max-width:520px;padding:18px 20px;border-radius:18px;background:var(--bg2);border:1px solid var(--line);display:grid;gap:12px;justify-items:center;text-align:center}
+.wastep p{margin:0}
+.wastep .pill{animation:beat 3.6s ease-in-out 1.2s infinite}
+.fmsg .pill{margin-top:12px}
+
+.punt{margin:22px auto 0;max-width:760px;text-align:center;font-size:14.5px;color:var(--muted)}
+.punt2{margin:4px 0 8px}
+
 h1 .mark,h1 .sub{display:block}
 h1 .sub{font-family:var(--sans);font-weight:400}
 .crumbs{font-size:13px;color:var(--muted);padding-top:22px}

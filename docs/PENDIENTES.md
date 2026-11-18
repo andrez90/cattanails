@@ -3,7 +3,9 @@
 ## Datos del negocio
 - [ ] Dirección exacta, horario y teléfono (hoy solo dice "Alcantarilla, Murcia").
 - [x] Número de WhatsApp: +34 602 44 71 02 (en todos los botones; se puede cambiar desde el panel, «Mi web» → Horario).
-- [ ] **Confirmar el horario de ejemplo de la agenda (lun-vie 10-14 y 16-20, sáb 10-14), las duraciones y la cancelación hasta 4 h antes.** Se cambia en el panel («Mi web»). No publicar sin esto.
+- [x] Horario de Pilar: 9:00-14:00 y 16:00-20:00 (lunes a viernes) y duraciones reales: pies 1 h, manos semipermanente o con refuerzo 1 h 30, extensiones 2 h 30.
+- [ ] **¿Abre los sábados?** Hoy el sábado tiene 10:00-14:00 provisional. Confirmar o quitarlo en el panel («Mi web» → Horario).
+- [ ] Precios reales de cada servicio (panel → «Mi web» → Servicios y Textos) y si quiere cambiar la cancelación hasta 4 h antes.
 - [ ] **Dirección de la web** en el panel («Mi web» → Textos → Dirección de tu web), para que los enlaces de los mensajes de WhatsApp funcionen.
 - [ ] Correo de Pilar para invitarla al panel («Mi web» → Quién puede entrar).
 - [ ] En Supabase (proyecto `catta-nails`) → Authentication → URL Configuration: poner la dirección de la web como Site URL y añadir `https://TU-DOMINIO/admin` en Redirect URLs (para los correos de confirmar acceso y recuperar contraseña).

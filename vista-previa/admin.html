@@ -68,7 +68,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-
 .kpi.up b{color:var(--ok)}.kpi.down b{color:var(--bad)}
 .quick{display:flex;flex-wrap:wrap;gap:8px}
 .qk{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600}
-.qk b{color:var(--accent)}.qk.hot{background:var(--soft);border-color:var(--rose)}
+.qk b{color:var(--accent)}.qk.wa{border-color:var(--wa);color:var(--wa)}.qk.hot{background:var(--soft);border-color:var(--rose)}
 /* citas */
 .appt{display:grid;grid-template-columns:58px 1fr;gap:4px 12px;padding:12px 0;border-top:1px solid var(--line)}
 .appt:first-child{border-top:0}
@@ -147,12 +147,15 @@ fieldset{border:0;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:6px 14px}le
   .mtop .demo{padding:4px 10px;border-radius:999px;font-size:12px}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+fieldset.next{display:grid;gap:10px;padding:12px;border:1px solid var(--line);border-radius:14px}
+.li.conf .acts{flex:none}
 </style>
 </head><body>
 <div id="app"><p style="padding:24px">Cargando el panel…</p></div><div class="modal" id="modal" hidden role="dialog" aria-modal="true"></div><div class="toast" id="toast" role="status" aria-live="polite"></div><script>/* ---------- DEMO (solo en la vista previa): imita la base de datos de Catta Nails en el navegador ----------
    Sitio y panel comparten estos datos (localStorage). Los registros de ejemplo llevan "Ejemplo" en el nombre. */
 (function(){
-var KEY='catta-demo-v2';
+var KEY='catta-demo-v3';
 var DAYS=['sun','mon','tue','wed','thu','fri','sat'];
 function pad(n){return (n<10?'0':'')+n}
 function iso(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
@@ -163,29 +166,29 @@ function uid(){return 'd'+Date.now().toString(36)+rnd(5)}
 function addDays(d,n){return new Date(d.getFullYear(),d.getMonth(),d.getDate()+n)}
 function norm(p){var d=String(p||'').replace(/[^0-9+]/g,'');if(/^[67]\d{8}$/.test(d))return '+34'+d;if(/^\+?\d{9,15}$/.test(d))return d.charAt(0)==='+'?d:'+'+d;return null}
 function seed(){
-  var t=new Date(),s={v:2,
+  var t=new Date(),s={v:3,
     settings:{timezone:'Europe/Madrid',booking_enabled:true,min_notice_minutes:120,max_advance_days:60,slot_step_minutes:30,cancel_limit_hours:4,wa_number:'34602447102',
-      working_hours:{mon:[['10:00','14:00'],['16:00','20:00']],tue:[['10:00','14:00'],['16:00','20:00']],wed:[['10:00','14:00'],['16:00','20:00']],thu:[['10:00','14:00'],['16:00','20:00']],fri:[['10:00','14:00'],['16:00','20:00']],sat:[['10:00','14:00']],sun:[]}},
-    services:[{id:'s1',name:'Manicura',duration_min:60,buffer_min:0,price:0,active:true,sort:1},{id:'s2',name:'Uñas con diseño',duration_min:90,buffer_min:0,price:0,active:true,sort:2},
-      {id:'s3',name:'Mantenimiento',duration_min:60,buffer_min:0,price:0,active:true,sort:3},{id:'s4',name:'Consulta y consejo',duration_min:30,buffer_min:0,price:0,active:true,sort:4}],
+      working_hours:{mon:[['09:00','14:00'],['16:00','20:00']],tue:[['09:00','14:00'],['16:00','20:00']],wed:[['09:00','14:00'],['16:00','20:00']],thu:[['09:00','14:00'],['16:00','20:00']],fri:[['09:00','14:00'],['16:00','20:00']],sat:[['10:00','14:00']],sun:[]}},
+    services:[{id:'s1',name:'Manos semipermanente',duration_min:90,buffer_min:0,price:0,active:true,sort:1},{id:'s2',name:'Manos con refuerzo (rubber o builder)',duration_min:90,buffer_min:0,price:0,active:true,sort:2},
+      {id:'s3',name:'Extensiones (polygel)',duration_min:150,buffer_min:0,price:0,active:true,sort:3},{id:'s4',name:'Pies',duration_min:60,buffer_min:0,price:0,active:true,sort:4}],
     customers:[],appts:[],timeoff:[],leads:[],pays:[],exps:[],content:{},outbox:[],admins:['demo@cattanails']};
   function cust(n,p){var c={id:uid(),full_name:n,phone:p,notes:'',no_show_count:0};s.customers.push(c);return c}
   function ap(c,sv,dayOff,time,st,price){var d=addDays(t,dayOff);var a={id:uid(),customer_id:c.id,service_id:sv.id,service_name:sv.name,date:iso(d),start:mins(time),end:mins(time)+sv.duration_min,status:st,source:dayOff%2?'web':'manual',price:price,code:'CN-'+rnd(4),tok:rnd(24),note:''};s.appts.push(a);return a}
   var c1=cust('Ejemplo · Laura','+34611000001'),c2=cust('Ejemplo · Marta','+34611000002'),c3=cust('Ejemplo · Sara','+34611000003');
-  var a1=ap(c1,s.services[1],-6,'10:00','completada',35);s.pays.push({id:uid(),appointment_id:a1.id,category:'salon',amount:35,method:'bizum',concept:'Uñas con diseño',date:a1.date});
-  var a2=ap(c2,s.services[0],-3,'16:00','completada',20);s.pays.push({id:uid(),appointment_id:a2.id,category:'salon',amount:20,method:'efectivo',concept:'Manicura',date:a2.date});
+  var a1=ap(c1,s.services[1],-6,'10:00','completada',35);s.pays.push({id:uid(),appointment_id:a1.id,category:'salon',amount:35,method:'bizum',concept:'Manos con refuerzo (rubber o builder)',date:a1.date});
+  var a2=ap(c2,s.services[0],-3,'16:00','completada',20);s.pays.push({id:uid(),appointment_id:a2.id,category:'salon',amount:20,method:'efectivo',concept:'Manos semipermanente',date:a2.date});
   ap(c3,s.services[2],-2,'11:00','no_show',25);
-  var tday=t.getDay()===0?1:0;ap(c2,s.services[1],tday,'17:00','confirmada',35);ap(c1,s.services[2],tday+2,'10:30','confirmada',25);ap(c3,s.services[0],tday+3,'12:00','confirmada',20);
+  var tday=t.getDay()===0?1:0;ap(c2,s.services[1],tday,'17:00','confirmada',35);ap(c1,s.services[3],tday+1,'10:30','confirmada',25);ap(c3,s.services[0],tday+3,'12:00','confirmada',20);
   s.exps.push({id:uid(),category:'material',amount:18.5,method:'tarjeta',note:'Esmaltes (ejemplo)',date:iso(addDays(t,-4))});
   s.leads.push({id:uid(),kind:'curso',name:'Ejemplo · Andrea',phone:'+34611000010',instagram:'@ejemplo.andrea',answers:{objetivo:'Montar mi propio negocio',experiencia:'Empiezo desde cero',inicio:'Lo antes posible',presencial:'Sí, sin problema',inversion:'Tengo presupuesto para empezar'},score:90,status:'nuevo',notes:'',created_at:new Date(t-864e5).toISOString()});
   s.leads.push({id:uid(),kind:'curso',name:'Ejemplo · Carla',phone:'+34611000011',instagram:'@ejemplo.carla',answers:{objetivo:'Es un hobby',experiencia:'Ya hago uñas por mi cuenta',inicio:'Solo me estoy informando',presencial:'Vivo lejos, pero me organizo',inversion:'Depende del precio'},score:30,status:'contactado',notes:'Le escribí el lunes.',created_at:new Date(t-3*864e5).toISOString()});
   s.leads.push({id:uid(),kind:'lista',name:'Ejemplo · Nuria',contact:'@ejemplo.nuria',answers:{},score:0,status:'nuevo',notes:'',created_at:new Date(t-2*864e5).toISOString()});
   s.outbox.push({id:uid(),kind:'curso',to_phone:'+34611000010',to_name:'Ejemplo · Andrea',body:'Hola Andrea, soy Pilar de Catta Nails 29. Recibí tu solicitud para el curso de uñas. Te escribo para contarte fechas, duración y precio. ¿Cuándo te viene bien hablar?',send_at:new Date(t-864e5).toISOString(),status:'pendiente'});
   return s}
-function load(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===2)return s}catch(e){}var x=seed();save(x);return x}
+function load(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===3)return s}catch(e){}var x=seed();save(x);return x}
 var MEM=null;
 function save(s){MEM=s;try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
-function st(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===2){MEM=s;return s}}catch(e){}if(MEM)return MEM;MEM=seed();save(MEM);return MEM}
+function st(){try{var s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===3){MEM=s;return s}}catch(e){}if(MEM)return MEM;MEM=seed();save(MEM);return MEM}
 function svc(s,id){for(var i=0;i<s.services.length;i++)if(s.services[i].id===id)return s.services[i]}
 function cus(s,id){for(var i=0;i<s.customers.length;i++)if(s.customers[i].id===id)return s.customers[i]}
 function busy(s,date,a,b,skip){return s.appts.some(function(x){return x.id!==skip&&(x.status==='confirmada'||x.status==='pendiente')&&x.date===date&&a<x.end&&b>x.start})}
@@ -197,7 +200,7 @@ function slots(sid,date){
     var at=new Date(d.getFullYear(),d.getMonth(),d.getDate(),0,m);if(at<new Date(now.getTime()+s.settings.min_notice_minutes*6e4))continue;
     if(!busy(s,date,m,m+sv.duration_min)&&!off(s,date,m,m+sv.duration_min))out.push(hm(m))}});return out}
 var TPL={confirmacion:'Hola {nombre}, soy Pilar de Catta Nails 29. Tu cita de {servicio} quedó reservada para el {fecha} a las {hora}. Tu código es {codigo}. Si necesitas cancelar, usa tu enlace: {enlace}',
-  recordatorio:'Hola {nombre}, te recuerdo tu cita de {servicio} mañana {fecha} a las {hora} en Catta Nails 29. ¡Te espero! Si no puedes venir, cancélala aquí para liberar la hora: {enlace}',
+  recordatorio:'Hola {nombre} 😊 Te recuerdo tu cita de {servicio} mañana {fecha} a las {hora} en Catta Nails 29. ¿Me confirmas que vienes? Respóndeme SÍ. Recuerda llegar a tu hora. Si no puedes venir, cancélala aquí para liberar la hora: {enlace}',
   gracias:'Gracias por venir, {nombre}. Si te gustó el resultado, me ayudarías mucho dejando tu opinión en Google o etiquetándome en Instagram @catta_nails29.',
   vuelve:'Hola {nombre}, ya toca mantenimiento de tus uñas. Reserva tu hora aquí: {web}/reservar',
   curso:'Hola {nombre}, soy Pilar de Catta Nails 29. Recibí tu solicitud para el curso de uñas. Te escribo para contarte fechas, duración y precio. ¿Cuándo te viene bien hablar?',
@@ -234,20 +237,22 @@ var F={
       citas_mes:s.appts.filter(function(a){return a.date>=m0&&a.status==='completada'}).length,no_show_mes:s.appts.filter(function(a){return a.date>=m0&&a.status==='no_show'}).length,
       leads_nuevos:s.leads.filter(function(l){return l.status==='nuevo'}).length,wa_pendientes:s.outbox.filter(function(m){return m.status==='pendiente'&&new Date(m.send_at)<=new Date()}).length}},
   adm_appointments:function(b){var s=st();return s.appts.filter(function(a){return a.date>=b.p_from&&a.date<=b.p_to}).sort(function(a,b2){return (a.date+hm(a.start))<(b2.date+hm(b2.start))?-1:1}).map(function(a){var c=cus(s,a.customer_id);
-    return {id:a.id,fecha:a.date,hora:hm(a.start),fin:hm(a.end),servicio:a.service_name,precio:a.price,estado:a.status,origen:a.source,codigo:a.code,nota:a.note,interna:a.internal||'',nombre:c.full_name,telefono:c.phone,cliente_id:c.id,
+    return {id:a.id,fecha:a.date,hora:hm(a.start),fin:hm(a.end),servicio:a.service_name,precio:a.price,estado:a.status,origen:a.source,codigo:a.code,nota:a.note,interna:a.internal||'',nombre:c.full_name,telefono:c.phone,cliente_id:c.id,service_id:a.service_id,asistencia:!!a.conf,
       pagado:s.pays.filter(function(p){return p.appointment_id===a.id}).reduce(function(x,p){return x+ +p.amount},0)}})},
   adm_set_status:function(b){var s=st(),a=s.appts.filter(function(x){return x.id===b.p_id})[0];if(!a)return {ok:false,error:'not_found'};
     if(b.p_status==='confirmada'&&busy(s,a.date,a.start,a.end,a.id))return {ok:false,error:'slot_unavailable'};a.status=b.p_status;
     if(b.p_status==='cancelada'||b.p_status==='no_show')s.outbox.forEach(function(m){if(m.appointment_id===a.id&&m.status==='pendiente')m.status='anulado'});
     if(b.p_status==='no_show'){var c=cus(s,a.customer_id);c.no_show_count++}
     if(b.p_status==='completada'){if(+b.p_amount>0)s.pays.push({id:uid(),appointment_id:a.id,category:'salon',amount:+b.p_amount,method:b.p_method||'efectivo',concept:a.service_name,date:iso(new Date())});
-      queue(s,a,'gracias',new Date(Date.now()+2*36e5));queue(s,a,'vuelve',addDays(apptDate(a),21))}
+      queue(s,a,'gracias',new Date(Date.now()+2*36e5));if(!s.appts.some(function(x){return x.customer_id===a.customer_id&&x.id!==a.id&&x.status==='confirmada'&&apptDate(x)>new Date()}))queue(s,a,'vuelve',addDays(apptDate(a),28))}
     save(s);return ok()},
   adm_book:function(b){var p=b.p,s=st(),sv=svc(s,p.service_id),ph=norm(p.phone);if(!sv)return {ok:false,error:'bad_service'};if(!ph)return {ok:false,error:'bad_phone'};
     var st0=mins(p.time),en=st0+(+p.duration||sv.duration_min);if(busy(s,p.date,st0,en))return {ok:false,error:'slot_unavailable'};
     var c=s.customers.filter(function(x){return x.phone===ph})[0];if(!c){c={id:uid(),full_name:p.name,phone:ph,notes:'',no_show_count:0};s.customers.push(c)}
     var a={id:uid(),customer_id:c.id,service_id:sv.id,service_name:sv.name,date:p.date,start:st0,end:en,status:'confirmada',source:'manual',price:p.price===''||p.price==null?sv.price:+p.price,code:'CN-'+rnd(4),tok:rnd(24),note:'',internal:p.note||''};
+    s.outbox.forEach(function(m){if(m.kind==='vuelve'&&m.status==='pendiente'&&s.appts.some(function(x){return x.id===m.appointment_id&&x.customer_id===c.id}))m.status='anulado'});
     s.appts.push(a);if(p.notify!==false){queue(s,a,'confirmacion');var r=new Date(apptDate(a)-864e5);if(r>new Date())queue(s,a,'recordatorio',r)}save(s);return ok({id:a.id})},
+  adm_confirm:function(b){var s=st(),a=s.appts.filter(function(x){return x.id===b.p_id})[0];if(a)a.conf=b.p_on!==false;save(s);return ok()},
   adm_timeoff:function(b){var s=st(),p=b.p||{};if(b.p_action==='add')s.timeoff.push({id:uid(),from:p.from_date+' '+(p.from_time||'00:00'),to:p.to_date+' '+(p.to_time||'23:59'),reason:p.reason||''});
     if(b.p_action==='del')s.timeoff=s.timeoff.filter(function(x){return x.id!==p.id});save(s);var n=iso(new Date());
     return s.timeoff.filter(function(x){return x.to.slice(0,10)>=n}).map(function(x){return {id:x.id,desde:x.from,hasta:x.to,motivo:x.reason}})},
@@ -307,20 +312,20 @@ var LEADST={nuevo:'Nueva',contactado:'Contactada',interesada:'Interesada',inscri
 var METODOS={efectivo:'Efectivo',tarjeta:'Tarjeta',bizum:'Bizum',transferencia:'Transferencia',otro:'Otro'};
 var CATING={salon:'Salón',curso:'Curso',producto:'Producto',otro:'Otro'};
 var CATGAS={material:'Material',alquiler:'Alquiler',suministros:'Luz, agua, internet',publicidad:'Publicidad',formacion:'Formación',impuestos:'Impuestos',otro:'Otro'};
-var KINDS={confirmacion:'Confirmación de cita',recordatorio:'Recordatorio (24 h antes)',gracias:'Gracias tras la cita',vuelve:'Vuelve a reservar (21 días)',curso:'Respuesta a solicitud del curso',lista:'Respuesta a lista del curso'};
-var TPLDEF={confirmacion:'Hola {nombre}, soy Pilar de Catta Nails 29. Tu cita de {servicio} quedó reservada para el {fecha} a las {hora}. Tu código es {codigo}. Si necesitas cancelar, usa tu enlace: {enlace}',
-  recordatorio:'Hola {nombre}, te recuerdo tu cita de {servicio} mañana {fecha} a las {hora} en Catta Nails 29. ¡Te espero! Si no puedes venir, cancélala aquí para liberar la hora: {enlace}',
+var KINDS={confirmacion:'Confirmación de cita',recordatorio:'Recordatorio (24 h antes)',gracias:'Gracias tras la cita',vuelve:'Vuelve a reservar (4 semanas, si no tiene cita)',curso:'Respuesta a solicitud del curso',lista:'Respuesta a lista del curso'};
+var TPLDEF={confirmacion:'Hola {nombre}, soy Pilar de Catta Nails 29. Tu cita de {servicio} quedó reservada para el {fecha} a las {hora} (código {codigo}). Te pido llegar puntual: trabajo con horarios justos y si llegas tarde puede que no pueda atenderte. Si necesitas cancelar: {enlace}',
+  recordatorio:'Hola {nombre} 😊 Te recuerdo tu cita de {servicio} mañana {fecha} a las {hora} en Catta Nails 29. ¿Me confirmas que vienes? Respóndeme SÍ. Recuerda llegar a tu hora. Si no puedes venir, cancélala aquí para liberar la hora: {enlace}',
   gracias:'Gracias por venir, {nombre}. Si te gustó el resultado, me ayudarías mucho dejando tu opinión en Google o etiquetándome en Instagram @catta_nails29.',
-  vuelve:'Hola {nombre}, ya toca mantenimiento de tus uñas. Reserva tu hora aquí: {web}/reservar',
+  vuelve:'Hola {nombre}, ya va tocando volver a hacerte las uñas 💅 Reserva tu hora aquí: {web}/reservar',
   curso:'Hola {nombre}, soy Pilar de Catta Nails 29. Recibí tu solicitud para el curso de uñas. Te escribo para contarte fechas, duración y precio. ¿Cuándo te viene bien hablar?',
   lista:'Hola {nombre}, soy Pilar de Catta Nails 29. Te apunté a la lista del curso: te aviso en cuanto abra el próximo grupo.'};
 /* Textos de la web que se pueden cambiar sin código (la web los lee al cargar) */
 var TEXTS=[['site.url','Dirección de tu web','Ej.: https://tudominio.com — se usa en los enlaces de los mensajes de WhatsApp.'],['site.aviso','Aviso arriba de todo (promoción, vacaciones…)','Ej.: Del 24 al 26 de diciembre el salón está cerrado. Vacío = no se muestra.'],
   ['site.hero_badge','Etiqueta pequeña del inicio','Ej.: Reserva online · sin llamadas'],
   ['site.hero_lead','Frase principal del inicio','La frase que está debajo de «CATTA».'],
-  ['site.precio_manicura','Precio de manicura (lista de servicios)','Ej.: Desde 20 €'],
-  ['site.precio_diseno','Precio de uñas con diseño','Ej.: Desde 35 €'],
-  ['site.precio_mantenimiento','Precio de mantenimiento','Ej.: Desde 25 €'],
+  ['site.precio_manicura','Texto bajo «Manos» (lista del inicio)','Ej.: 1 h 30 · desde 25 €'],
+  ['site.precio_diseno','Texto bajo «Extensiones de polygel»','Ej.: Desde 2 h 30 · desde 45 €'],
+  ['site.precio_mantenimiento','Texto bajo «Pies»','Ej.: 1 h · desde 20 €'],
   ['site.curso_info','Próximo grupo del curso (página Formación)','Ej.: Próximo grupo: 12 de enero · 6 plazas. Vacío = no se muestra.'],
   ['site.horario','Horario (sección «La visita»)','Ej.: Lunes a viernes de 10:00 a 14:00 y de 16:00 a 20:00.'],
   ['site.direccion','Dirección o zona (sección «La visita»)','Ej.: Calle Mayor 10, Alcantarilla. Vacío = texto actual.']];
@@ -427,14 +432,21 @@ function V(html){var v=$('#view');v.innerHTML=html;return v}
 function apptCard(a){
   var txt='Hola '+first(a.nombre)+', soy Pilar de Catta Nails 29. Te escribo por tu cita de '+a.servicio+' el '+dayName(a.fecha||iso(new Date()),true)+' a las '+a.hora+'.';
   return '<article class="appt st-'+esc(a.estado)+'"><div class="t">'+esc(a.hora)+(a.fin?'<small>'+esc(a.fin)+'</small>':'')+'</div><div class="i"><strong>'+esc(a.nombre)+'</strong><span>'+esc(a.servicio)+(a.precio>0?' · '+eur(a.precio):'')+'</span>'+
-    (a.nota?'<em>«'+esc(a.nota)+'»</em>':'')+(a.interna?'<em>Nota: '+esc(a.interna)+'</em>':'')+'<span class="tag '+esc(a.estado)+'">'+esc(ESTADOS[a.estado]||a.estado)+(a.pagado>0?' · cobrado '+eur(a.pagado):'')+'</span></div>'+
+    (a.nota?'<em>«'+esc(a.nota)+'»</em>':'')+(a.interna?'<em>Nota: '+esc(a.interna)+'</em>':'')+'<span class="tag '+esc(a.estado)+'">'+esc(ESTADOS[a.estado]||a.estado)+(a.pagado>0?' · cobrado '+eur(a.pagado):'')+'</span>'+(a.asistencia&&a.estado==='confirmada'?'<span class="tag completada">✓ Confirmó que viene</span>':'')+'</div>'+
     '<div class="acts"><a class="ic wa" href="'+esc(waLink(a.telefono,txt))+'" target="_blank" rel="noopener" title="WhatsApp" aria-label="Escribir por WhatsApp a '+esc(a.nombre)+'"><svg viewBox="0 0 24 24"><path d="M12 3C6.9 3 3 6.6 3 11.1c0 2.3 1 4.3 2.7 5.8L5 21l4.3-1.9c.9.2 1.8.3 2.7.3 5.1 0 9-3.6 9-8.1S17.1 3 12 3z"/></svg></a>'+
-    (a.estado==='confirmada'?'<button type="button" class="btn sm" data-done="'+esc(a.id)+'" data-price="'+esc(a.precio||'')+'" data-name="'+esc(a.nombre)+'">Hecha y cobrar</button><button type="button" class="btn sm ghost" data-ns="'+esc(a.id)+'">No vino</button><button type="button" class="btn sm ghost" data-cancel="'+esc(a.id)+'">Cancelar</button>':'')+
+    (a.estado==='confirmada'?'<button type="button" class="btn sm" data-done="'+esc(a.id)+'" data-price="'+esc(a.precio||'')+'" data-name="'+esc(a.nombre)+'" data-ph="'+esc(a.telefono)+'" data-sv="'+esc(a.service_id||'')+'" data-svn="'+esc(a.servicio)+'" data-day="'+esc(a.fecha||'')+'" data-time="'+esc(a.hora)+'">Hecha y cobrar</button><button type="button" class="btn sm ghost" data-ns="'+esc(a.id)+'">No vino</button><button type="button" class="btn sm ghost" data-cancel="'+esc(a.id)+'">Cancelar</button>':'')+
     (a.estado==='cancelada'||a.estado==='no_show'?'<button type="button" class="btn sm ghost" data-reopen="'+esc(a.id)+'">Reactivar</button>':'')+'</div></article>'}
 function apptActions(root,reload){
   root.onclick=function(e){var b=e.target.closest('button');if(!b)return;
-    if(b.dataset.done){modal('Cita hecha: '+b.dataset.name,'<p class="hint">Apunta lo que te pagó y queda en tus finanzas. Si no cobraste, deja 0.</p><div class="row2"><label>Importe (€)<input name="amount" type="number" min="0" step="0.5" inputmode="decimal" value="'+esc(b.dataset.price||'')+'"></label><label>Forma de pago'+sel('method',METODOS,'efectivo')+'</label></div><p class="hint">Se programa un mensaje de agradecimiento y otro para que vuelva a reservar en 21 días.</p>',
-      function(f){return rpc('adm_set_status',{p_id:b.dataset.done,p_status:'completada',p_amount:+val(f,'amount')||0,p_method:val(f,'method')}).then(chk).then(function(){toast('Cita marcada como hecha');reload()})},'Guardar')}
+    if(b.dataset.done){var nd=iso(addDays(parse(b.dataset.day||iso(new Date())),28));
+      modal('Cita hecha: '+b.dataset.name,'<p class="hint">Apunta lo que te pagó y queda en tus finanzas. Si no cobraste, deja 0.</p><div class="row2"><label>Importe (€)<input name="amount" type="number" min="0" step="0.5" inputmode="decimal" value="'+esc(b.dataset.price>0?b.dataset.price:'')+'"></label><label>Forma de pago'+sel('method',METODOS,'efectivo')+'</label></div>'+
+        '<fieldset class="next"><legend>Su próxima cita (antes de que se vaya)</legend><label class="chk"><input type="checkbox" name="nx" checked> Reservarle ya la próxima: '+esc(b.dataset.svn)+'</label><div class="row2"><label>Día<input type="date" name="nd" value="'+nd+'"></label><label>Hora<input type="time" name="nt" step="300" value="'+esc(b.dataset.time||'')+'"></label></div><p class="hint">Por defecto, dentro de 4 semanas, mismo día y hora. Se le programa la confirmación y el recordatorio por WhatsApp.</p></fieldset>',
+      function(f){var nx=f.elements.nx.checked&&val(f,'nd')&&val(f,'nt');
+        return rpc('adm_set_status',{p_id:b.dataset.done,p_status:'completada',p_amount:+val(f,'amount')||0,p_method:val(f,'method')}).then(chk).then(function(){
+          if(!nx){toast('Cita marcada como hecha');reload();return}
+          return rpc('adm_book',{p:{service_id:b.dataset.sv,date:val(f,'nd'),time:val(f,'nt'),name:b.dataset.name,phone:b.dataset.ph,notify:true}}).then(function(r){
+            if(r&&r.ok===false){toast(r.error==='slot_unavailable'?'Cita hecha. La próxima no se guardó: esa hora ya está ocupada, elige otra en la Agenda.':'Cita hecha. La próxima no se pudo guardar.',true)}else toast('Hecha y próxima cita reservada para el '+dayName(val(f,'nd'))+' a las '+val(f,'nt'));reload()})})},'Guardar')}
+    else if(b.dataset.conf)rpc('adm_confirm',{p_id:b.dataset.conf,p_on:b.dataset.on==='1'}).then(function(){toast(b.dataset.on==='1'?'Marcada: confirmó que viene':'Confirmación quitada');reload()}).catch(fail);
     else if(b.dataset.ns)status(b.dataset.ns,'no_show','Marcada como «no vino»');
     else if(b.dataset.cancel){modal('¿Cancelar esta cita?','<p>La hora queda libre para otra clienta y se anulan los recordatorios. Avísale por WhatsApp si hace falta.</p>',function(){return status(b.dataset.cancel,'cancelada','Cita cancelada')},'Sí, cancelar')}
     else if(b.dataset.reopen)status(b.dataset.reopen,'confirmada','Cita reactivada');
@@ -444,19 +456,32 @@ function apptActions(root,reload){
 function sel(n,map,v){return '<select name="'+n+'">'+Object.keys(map).map(function(k){return '<option value="'+esc(k)+'"'+(k===v?' selected':'')+'>'+esc(map[k])+'</option>'}).join('')+'</select>'}
 
 /* ---------- INICIO ---------- */
-function vInicio(){return rpc('adm_dashboard').then(function(d){
+function vInicio(){var tm=iso(addDays(new Date(),1));return Promise.all([rpc('adm_dashboard'),rpc('adm_appointments',{p_from:tm,p_to:tm}),settings()]).then(function(R){var d=R[0],man=R[1].filter(function(a){return a.estado==='confirmada'}),tp=R[2].content['wa.templates']||{};
   var ben=(+d.ingresos_mes)-(+d.gastos_mes),h=new Date().getHours();
   var v=V('<header class="vh"><h1>'+(h<13?'Buenos días':h<20?'Buenas tardes':'Buenas noches')+'</h1><p>'+esc(dayName(iso(new Date()),true))+'</p></header>'+
     '<div class="kpis"><div class="kpi"><span>Ingresos del mes</span><b>'+eur(d.ingresos_mes)+'</b></div><div class="kpi"><span>Gastos del mes</span><b>'+eur(d.gastos_mes)+'</b></div>'+
     '<div class="kpi '+(ben>=0?'up':'down')+'"><span>Te queda</span><b>'+eur(ben)+'</b></div><div class="kpi"><span>Citas hechas este mes</span><b>'+(+d.citas_mes)+'</b>'+(d.no_show_mes?'<small>'+d.no_show_mes+' no vinieron</small>':'')+'</div></div>'+
     '<div class="quick">'+(d.wa_pendientes?'<button type="button" class="qk hot" data-go="whatsapp"><b>'+d.wa_pendientes+'</b> mensajes de WhatsApp por enviar</button>':'')+
     (d.leads_nuevos?'<button type="button" class="qk hot" data-go="curso"><b>'+d.leads_nuevos+'</b> interesadas nuevas en el curso</button>':'')+
-    '<button type="button" class="qk" data-go="agenda"><b>'+(+d.proximas7)+'</b> citas en los próximos 7 días</button><button type="button" class="qk" id="qnew">+ Nueva cita</button><button type="button" class="qk" id="qexp">+ Apuntar un gasto</button></div>'+
-    '<section class="card"><h2>Hoy</h2><div id="today">'+(d.hoy.length?d.hoy.map(apptCard).join(''):'<p class="empty">Hoy no tienes citas. Comparte tu enlace de reservas en Instagram para llenar huecos.</p>')+'</div></section>');
+    '<button type="button" class="qk wa" data-sum="0">📲 Resumen de hoy a mi WhatsApp</button><button type="button" class="qk wa" data-sum="1">📲 Resumen de mañana</button><button type="button" class="qk" data-go="agenda"><b>'+(+d.proximas7)+'</b> citas en los próximos 7 días</button><button type="button" class="qk" id="qnew">+ Nueva cita</button><button type="button" class="qk" id="qexp">+ Apuntar un gasto</button></div>'+
+    '<section class="card"><h2>Hoy</h2><div id="today">'+(d.hoy.length?d.hoy.map(apptCard).join(''):'<p class="empty">Hoy no tienes citas. Comparte tu enlace de reservas en Instagram para llenar huecos.</p>')+'</div></section>'+
+    '<section class="card"><div class="row"><h2>Mañana: confirma asistencia ('+man.filter(function(a){return a.asistencia}).length+'/'+man.length+')</h2></div><p class="hint">Envía el recordatorio con un toque y marca «Confirmó» cuando te responda.</p><div id="manana">'+
+      (man.length?man.map(function(a){var p=a.fecha.split('-');var t=(tp.recordatorio||TPLDEF.recordatorio).split('{nombre}').join(first(a.nombre)).split('{servicio}').join(a.servicio).split('{fecha}').join(p[2]+'/'+p[1]).split('{hora}').join(a.hora).split('{enlace}').join(SITE+'/mi-cita').split('{web}').join(SITE);
+        return '<div class="li conf"><span><b>'+esc(a.hora)+'</b> '+esc(a.nombre)+' · '+esc(a.servicio)+(a.asistencia?' <span class="tag completada">✓ Confirmó</span>':'')+'</span><span class="acts"><a class="btn sm wa" href="'+esc(waLink(a.telefono,t))+'" target="_blank" rel="noopener">Recordar</a>'+
+          (a.asistencia?'<button type="button" class="btn sm ghost" data-conf="'+esc(a.id)+'" data-on="0">Quitar ✓</button>':'<button type="button" class="btn sm" data-conf="'+esc(a.id)+'" data-on="1">Confirmó ✓</button>')+'</span></div>'}).join(''):'<p class="empty sm">Mañana no hay citas.</p>')+'</div></section>');
   $$('[data-go]',v).forEach(function(b){b.onclick=function(){go(b.dataset.go)}});
+  $$('[data-sum]',v).forEach(function(b){b.onclick=function(){sendSummary(+b.dataset.sum)}});
   $('#qnew').onclick=function(){newAppt(iso(new Date()),vInicio)};$('#qexp').onclick=function(){newMoney('expense',vInicio)};
-  apptActions($('#today'),function(){vInicio();badges()});
+  apptActions($('#today'),function(){vInicio();badges()});apptActions($('#manana'),function(){vInicio()});
 })}
+
+/* Resumen del día al propio WhatsApp de Pilar (chat «Mensaje para mí»): sin API, un toque */
+function sendSummary(off){var w=window.open('about:blank','_blank');var d=iso(addDays(new Date(),off));
+  Promise.all([rpc('adm_appointments',{p_from:d,p_to:d}),settings()]).then(function(r){var list=r[0].filter(function(a){return a.estado==='confirmada'||a.estado==='completada'}),num=r[1].settings.wa_number;
+    var L=['📅 '+(off?'Mañana':'Hoy')+', '+dayName(d,true)+': '+(list.length?list.length+(list.length===1?' cita':' citas'):'sin citas')];
+    list.forEach(function(a){L.push('• '+a.hora+' '+a.nombre.replace(/^Ejemplo · /,'')+' · '+a.servicio+(a.precio>0?' · '+eur(a.precio):'')+(a.nota?' · «'+a.nota+'»':'')+' · '+a.telefono)});
+    if(!list.length)L.push('Buen momento para compartir el enlace de reservas en tus historias.');
+    var url=waLink(num,L.join('\n'));if(w){w.location.href=url}else location.href=url}).catch(function(e){if(w)w.close();fail(e)})}
 
 /* ---------- AGENDA ---------- */
 var wk=null;

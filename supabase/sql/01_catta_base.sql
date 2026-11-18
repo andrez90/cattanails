@@ -536,3 +536,9 @@ create extension if not exists pg_cron;
 -- programación cada 5 minutos de la función wa-send (cambia <ANON_KEY> por la clave pública del proyecto)
 -- select cron.schedule('catta-wa-send','*/5 * * * *', $$select net.http_post(url:='https://sleckhpzbqbwlvqevtbc.supabase.co/functions/v1/wa-send',
 --   headers:='{"Content-Type":"application/json","Authorization":"Bearer <ANON_KEY>"}'::jsonb, body:='{}'::jsonb, timeout_milliseconds:=20000)$$);
+
+-- ---------- 2026-11-18 · datos reales de Pilar (migración catta_datos_reales_pilar) ----------
+-- Horario lun-vie 9:00-14:00 y 16:00-20:00; servicios: Manos semipermanente 90, Manos con refuerzo (rubber o builder) 90,
+-- Extensiones (polygel) 150, Pies 60 (los anteriores quedan desactivados). Columna appointments.attendance_confirmed_at,
+-- función adm_confirm, "vuelve" a las 4 semanas solo si no tiene próxima cita (trigger cancel_vuelve) y textos con confirmación y puntualidad.
+-- El SQL exacto aplicado está en Supabase → Database → Migrations.

@@ -186,7 +186,9 @@ if(f){
       .then(function(r){if(!r||!r.ok)throw new Error(r&&r.error||'db');return true});
     var toMail=window.__demoRpc?Promise.reject(new Error('demo')):fetch(f.getAttribute('data-post')||'/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString(),signal:ctl?ctl.signal:undefined})
       .then(function(r){if(!r.ok)throw new Error('http '+r.status);return true});
-    toDb.catch(function(){return toMail}).then(function(){clearTimeout(to);toMail.catch(function(){});track('form_submit');setTimeout(function(){location.href=thanks},400)})
+    try{sessionStorage.setItem('catta-curso',JSON.stringify({name:f.elements.nombre.value.trim(),phone:f.elements.telefono.value.trim(),ig:fd.get('instagram')||'',lv:lv,a:ans}))}catch(e){}
+    toMail.catch(function(){});
+    toDb.catch(function(){return toMail}).then(function(){clearTimeout(to);track('form_submit');setTimeout(function(){location.href=thanks},400)})
       .catch(function(){clearTimeout(to);btn.disabled=false;btn.textContent='Enviar mi solicitud';fallback()});
   });
   var cp=$('#fbCopy');
@@ -235,7 +237,10 @@ if(lf){var lt0=Date.now();
     ['lnombre','lcontacto','lconsent'].forEach(function(n){var el=$('#'+n),m=LR[n](el.value||'');$('#e-'+n).textContent=m;if(m){el.setAttribute('aria-invalid','true');if(!bad)bad=el}else el.removeAttribute('aria-invalid')});
     if(bad){bad.focus();return}
     var msg=$('#lmsg'),btn=$('#lsend');
-    function done(){lf.querySelectorAll('.field,.actions').forEach(function(x){x.hidden=true});msg.hidden=false;msg.className='fmsg';msg.textContent='Listo, '+$('#lnombre').value.trim()+'. Pilar te avisará cuando abra plazas. Mientras tanto, síguela en Instagram.';track('lista_submit')}
+    function done(){lf.querySelectorAll('.field,.actions').forEach(function(x){x.hidden=true});msg.hidden=false;msg.className='fmsg';msg.textContent='Listo, '+$('#lnombre').value.trim()+'. Pilar te avisará cuando abra plazas. ';
+      var wl=$('a.pill.wa[href^="https://wa.me/"]');if(wl){var b=document.createElement('a');b.className='pill wa solid';b.target='_blank';b.rel='noopener';b.href=wl.href.split('?')[0];
+        setWaText(b,'Hola Pilar, me apunté a la lista del próximo curso de uñas.\n👤 '+$('#lnombre').value.trim()+'\n📱 '+$('#lcontacto').value.trim());b.textContent='Avisar a Pilar por WhatsApp';msg.appendChild(document.createElement('br'));msg.appendChild(b)}
+      track('lista_submit')}
     if(lf.elements['bot-field'].value||Date.now()-lt0<2500){done();return}
     btn.disabled=true;btn.textContent='Enviando…';
     var fd=new FormData(lf);
@@ -286,7 +291,7 @@ if(rf){
   /* salida por WhatsApp con lo ya elegido */
   function upWa(){var w=$('#waAlt');if(!w||!w.getAttribute('data-wa'))return;var m='Hola Pilar, quiero reservar una cita y no encuentro hora en la web.';if(rpick('servicio'))m+=' Servicio: '+rpick('servicio')+'.';if(fe.value)m+=' Día que me viene bien: '+fmtDay(fe.value)+'.';var n=rf.elements.nota.value.trim();if(n)m+=' Diseño: '+n+'.';w.href='https://wa.me/'+w.getAttribute('data-wa')+'?text='+encodeURIComponent(m)}
   /* llega desde la galería con un diseño elegido */
-  var hp0=hashParams();if(hp0.d){rf.elements.nota.value='Diseño de la web: '+hp0.d.slice(0,80);var rd=$('input[name="servicio"][value="Uñas con diseño"]',rf);if(rd)rd.checked=true;
+  var hp0=hashParams();if(hp0.d){rf.elements.nota.value='Diseño de la web: '+hp0.d.slice(0,80);var rd=$('input[name="servicio"][value="Manos semipermanente"]',rf);if(rd)rd.checked=true;
     var sd=$('.side p');if(sd){var tg=document.createElement('p');tg.className='picked';tg.textContent='Diseño elegido: '+hp0.d.slice(0,80);sd.parentNode.insertBefore(tg,sd.nextSibling)}}
   function loadSlots(pre){
     var nf0=$('#nextFree');if(nf0){nf0.hidden=true;nf0.innerHTML=''}
@@ -378,12 +383,14 @@ if(rf){
           return}
         track('reserva_submit');
         $('#rcodigo').value=r.code;$('#rhora').value=r.date+' '+r.time;
+        keepLast({code:r.code,name:rval('nombre').trim(),phone:rval('telefono').trim(),service:r.service,date:r.date,time:r.time,note:rf.elements.nota.value.trim()});
         var go=function(){location.href=thanks+'#c='+encodeURIComponent(r.code)+'&t='+encodeURIComponent(r.token)};
         /* aviso a Pilar por correo (Netlify Forms); si falla, la cita ya está en la agenda */
         Promise.race([netlify({codigo:r.code,hora_reservada:r.date+' '+r.time,servicio:r.service}).catch(function(){}),new Promise(function(x){setTimeout(x,2500)})]).then(go)
       }).catch(function(){fail(null)});
     }else{
       var code=newCode();$('#rcodigo').value=code;
+      keepLast({code:code,name:rval('nombre').trim(),phone:rval('telefono').trim(),service:rpick('servicio'),date:fe.value,franja:rpick('franja'),note:rf.elements.nota.value.trim()});
       netlify({}).then(function(){track('reserva_submit');location.href=thanks+'?c='+encodeURIComponent(code)}).catch(function(){fail(code)})
     }
   });
@@ -397,6 +404,17 @@ if(rf){
   var rag=$('#rfbBack');if(rag)rag.addEventListener('click',function(){$('#rfallback').hidden=true;rf.hidden=false;rgo(2)});
 }
 
+/* ---------- aviso a Pilar por WhatsApp: el mensaje sale ya escrito con todo el resumen ---------- */
+function keepLast(o){try{sessionStorage.setItem('catta-last',JSON.stringify(o))}catch(e){}}
+function getLast(k){try{return JSON.parse(sessionStorage.getItem(k)||'null')}catch(e){return null}}
+function setWaText(el,txt){if(!el)return;el.href=el.href.split('?')[0]+'?text='+encodeURIComponent(txt)}
+function bookMsg(o){var L=['Hola Pilar, acabo de reservar en la web:','👤 '+(o.name||''),'💅 '+(o.service||''),'📅 '+(o.date?fmtDay(o.date):'')+(o.time?' a las '+o.time:o.franja?' · '+o.franja+' (pendiente de confirmar hora)':'')];
+  if(o.note)L.push('✨ '+o.note);if(o.phone)L.push('📱 '+o.phone);if(o.code)L.push('Código: '+o.code);return L.join('\n')}
+var thw=$('#thWa');
+if(thw){var cs=getLast('catta-curso');if(cs){var LV={alto:'Quiero empezar pronto',medio:'Me interesa',bajo:'Me estoy informando'};
+  var M=['Hola Pilar, acabo de pedir plaza en el curso de uñas:','👤 '+cs.name,'📱 '+cs.phone+(cs.ig?' · '+cs.ig:'')];
+  [['objetivo','Para qué'],['experiencia','Experiencia'],['inicio','Cuándo empezar'],['presencial','Puedo ir'],['inversion','Inversión']].forEach(function(q){if(cs.a&&cs.a[q[0]])M.push('• '+q[1]+': '+cs.a[q[0]])});
+  M.push('Me gustaría recibir más información.');setWaText($('#thWaBtn'),M.join('\n'));thw.hidden=false;var tn=$('#thName');if(tn)tn.textContent=cs.name.split(' ')[0]}}
 /* ---------- página de reserva enviada ---------- */
 var okc=$('#okCode');
 if(okc){
@@ -410,9 +428,10 @@ if(okc){
       var d=$('#okDet');d.hidden=false;d.textContent=r.service+' · '+fmtDay(r.date)+' · '+r.time;
       var mg=$('#okManage');mg.hidden=false;mg.href=mg.getAttribute('href').split('#')[0]+'#c='+encodeURIComponent(hp.c)+'&t='+encodeURIComponent(hp.t);
       var ic=$('#okIcs');ic.hidden=false;ic.href=icsHref('Cita en Catta Nails 29 · '+r.service,r.date,r.time,60);ic.setAttribute('download','cita-catta-nails.ics');
-      var w=$('#okWa');if(w){try{var u=new URL(w.href);u.searchParams.set('text','Hola Pilar, acabo de reservar mi cita (código '+hp.c+').');w.href=u.toString()}catch(e){}}
+      var ls=getLast('catta-last');if(!ls||ls.code!==hp.c)ls={code:hp.c};ls.service=r.service;ls.date=r.date;ls.time=r.time;setWaText($('#okWa'),bookMsg(ls));
     }).catch(function(){});
-  }else if(code){var w2=$('#okWa');if(w2){try{var u2=new URL(w2.href);u2.searchParams.set('text','Hola Pilar, acabo de pedir una cita en la web. Mi código es '+code+'.');w2.href=u2.toString()}catch(e){}}}
+  }else if(code){var l2=getLast('catta-last');setWaText($('#okWa'),l2&&l2.code===code?bookMsg(l2):'Hola Pilar, acabo de pedir una cita en la web. Mi código es '+code+'.')}
+  if(code){var l0=getLast('catta-last');if(l0&&l0.code===code)setWaText($('#okWa'),bookMsg(l0))}
 }
 
 /* ---------- gestionar mi cita: ver y cancelar (libera la hora) ---------- */

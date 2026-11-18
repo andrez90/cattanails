@@ -65,7 +65,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-
 .kpi.up b{color:var(--ok)}.kpi.down b{color:var(--bad)}
 .quick{display:flex;flex-wrap:wrap;gap:8px}
 .qk{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600}
-.qk b{color:var(--accent)}.qk.hot{background:var(--soft);border-color:var(--rose)}
+.qk b{color:var(--accent)}.qk.wa{border-color:var(--wa);color:var(--wa)}.qk.hot{background:var(--soft);border-color:var(--rose)}
 /* citas */
 .appt{display:grid;grid-template-columns:58px 1fr;gap:4px 12px;padding:12px 0;border-top:1px solid var(--line)}
 .appt:first-child{border-top:0}
@@ -144,3 +144,6 @@ fieldset{border:0;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:6px 14px}le
   .mtop .demo{padding:4px 10px;border-radius:999px;font-size:12px}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+fieldset.next{display:grid;gap:10px;padding:12px;border:1px solid var(--line);border-radius:14px}
+.li.conf .acts{flex:none}

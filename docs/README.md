@@ -4,7 +4,8 @@
 - `docs/LANZAMIENTO.md`  pasos de despliegue, Search Console, Google Business y seguimiento.
 - `docs/SEGURIDAD.md`  Cloudflare, límites, plan de respuesta.
 - `docs/PANEL.md`  cómo entrar y usar el panel de administración.
-- `docs/WHATSAPP.md`  mensajes automáticos y lo que se encontró en el Drive.
+- `docs/WHATSAPP-BUSINESS.md`  textos para el WhatsApp Business de Pilar (modo provisional).
+- `docs/WHATSAPP.md`  mensajes automáticos con la API y lo que se encontró en el Drive.
 - `docs/AGENDA.md`  reservas del salón.
 - `docs/PENDIENTES.md`  lo que falta que entreguen Pilar o Andrés.
 - `docs/keywords.csv`  palabras clave con estimaciones marcadas.

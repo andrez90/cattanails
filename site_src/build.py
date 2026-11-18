@@ -196,9 +196,9 @@ def make(mode):
 <div class="rv"><span class="eyebrow">Servicios del salón</span><h2 style="margin:10px 0 16px">Uñas con diseño, <em>sin complicaciones.</em></h2>
 <p>Elige lo que necesitas y reserva tu cita. Pilar te dice el precio y el tiempo antes de confirmarla.</p>
 <div class="ctas" style="margin-top:22px"><a class="pill solid" href="{L('svc')}">Ver servicios</a></div></div>
-<ul class="svc-list rv"><li><a href="{L('svc')}#manicura"><strong>Manicura</strong><small data-k="site.precio_manicura">Precio al consultar</small></a></li>
-<li><a href="{L('svc')}#diseno"><strong>Uñas con diseño</strong><small data-k="site.precio_diseno">Precio al consultar</small></a></li>
-<li><a href="{L('svc')}#mantenimiento"><strong>Mantenimiento</strong><small data-k="site.precio_mantenimiento">Precio al consultar</small></a></li>
+<ul class="svc-list rv"><li><a href="{L('svc')}#manicura"><strong>Manos semipermanente o con refuerzo</strong><small data-k="site.precio_manicura">1 h 30 · precio al consultar</small></a></li>
+<li><a href="{L('svc')}#diseno"><strong>Extensiones de polygel</strong><small data-k="site.precio_diseno">Desde 2 h 30 · precio al consultar</small></a></li>
+<li><a href="{L('svc')}#mantenimiento"><strong>Pies</strong><small data-k="site.precio_mantenimiento">1 h · tradicional o semipermanente</small></a></li>
 <li><a href="{L('form')}"><strong>Formación</strong><small>Curso presencial</small></a></li></ul></div></section>
 
 <section class="sec" id="pilar" style="padding-top:20px"><div class="wrap about">
@@ -346,12 +346,13 @@ def make(mode):
 <div class="arch" style="justify-self:center">{IM('n1','Uñas french rojas con flor y pedrería',prio=True)}</div></section></div>
 
 <section class="band sec"><div class="wrap"><div class="sec-head rv"><span class="eyebrow">Qué hacemos</span><h2>Servicios <em>del salón.</em></h2><p>El precio depende del diseño. Pilar te lo dice antes de confirmar tu cita.</p></div>
-<div class="svc3 rv"><div class="box" id="manicura"><h3>Manicura</h3><p>Preparación de la uña natural y acabado en el color que elijas.</p><span class="price">Precio al consultar</span></div>
-<div class="box" id="diseno"><h3>Uñas con diseño</h3><p>French, flores, mariposas, detalles dorados y pedrería, dibujados a mano alzada.</p><span class="price">Precio al consultar</span></div>
-<div class="box" id="mantenimiento"><h3>Mantenimiento</h3><p>Renovación y cuidado para que tu set siga bien semanas después. Resultado estético y funcional.</p><span class="price">Precio al consultar</span></div></div></div></section>
+<div class="svc3 rv"><div class="box" id="manicura"><h3>Manos</h3><p>Semipermanente o con refuerzo de base rubber o builder. Con diseño a mano alzada si quieres: french, flores, mariposas, dorados.</p><span class="price">1 h 30 · precio al consultar</span></div>
+<div class="box" id="diseno"><h3>Extensiones</h3><p>Extensiones de polygel para alargar y dar forma a tu uña, también con diseño.</p><span class="price">Desde 2 h 30 · precio al consultar</span></div>
+<div class="box" id="mantenimiento"><h3>Pies</h3><p>Pedicura tradicional o semipermanente, con el mismo cuidado y acabado que en manos.</p><span class="price">1 h · precio al consultar</span></div></div>
+<p class="punt rv">⏰ Pilar trabaja con horarios justos para que nadie espere: llega a tu hora. Si llegas tarde puede que no pueda atenderte, para no retrasar a la siguiente clienta.</p></div></section>
 
 <section class="sec"><div class="wrap"><div class="sec-head rv"><span class="eyebrow">Cómo reservar</span><h2>Tu cita en <em>tres pasos.</em></h2></div>
-<ol class="steps rv" style="padding:0;margin:0"><li><h3>Elige servicio y día</h3><p>Indica qué quieres hacerte y qué día te viene bien.</p></li><li><h3>Elige tu hora</h3><p>Ves las horas libres y reservas la que prefieras. Pilar te cuenta el precio exacto del diseño.</p></li><li><h3>Ven al salón</h3><p>Te damos la dirección exacta al confirmar. Si tienes una foto de referencia, envíala.</p></li></ol>
+<ol class="steps rv" style="padding:0;margin:0"><li><h3>Elige servicio y día</h3><p>Indica qué quieres hacerte y qué día te viene bien.</p></li><li><h3>Elige tu hora</h3><p>Ves las horas libres y reservas la que prefieras. Pilar te cuenta el precio exacto del diseño.</p></li><li><h3>Ven al salón, puntual</h3><p>Pilar te recuerda la cita el día antes para que confirmes. Llega a tu hora: así nadie espera.</p></li></ol>
 <p style="text-align:center;margin-top:28px"><a class="pill solid" href="{L('book')}" data-evt="reserva_click">Reservar cita</a></p></div></section>
 
 <section class="band sec" style="padding-block:60px"><div class="wrap"><div class="strip rv">{''.join(IM(n,a) for n,a in [('n2','French con mariposa pintada a mano'),('n3','Uñas rojas con detalle dorado'),('n5','Manicura nude natural'),('n4','French con flor verde')])}</div></div></section>
@@ -372,7 +373,7 @@ def make(mode):
 
 
     # ---------------- RESERVAR (SALÓN) ----------------
-    SERV = ['Manicura', 'Uñas con diseño', 'Mantenimiento', 'Consulta y consejo']
+    SERV = ['Manos semipermanente', 'Manos con refuerzo (rubber o builder)', 'Extensiones (polygel)', 'Pies']  # mismos nombres que en la agenda (panel)
     bform = f"""<form id="reservaForm" name="reserva" method="POST" action="{L('bookok')}" data-netlify="true" netlify-honeypot="bot-field" data-thanks="{L('bookok')}" data-post="/" data-policy="{POLICY_VERSION}" novalidate>
 <input type="hidden" name="form-name" value="reserva"><input type="hidden" name="codigo" id="rcodigo" value=""><input type="hidden" name="hora_reservada" id="rhora" value="">
 <p class="hp" aria-hidden="true"><label>No rellenar este campo <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
@@ -393,6 +394,7 @@ def make(mode):
 <div class="field"><label for="rtelefono">Tu teléfono (mejor si tiene WhatsApp) *</label><input type="tel" id="rtelefono" name="telefono" autocomplete="tel" inputmode="tel" placeholder="+34 600 000 000" required aria-describedby="e-rtelefono"><p class="err" id="e-rtelefono" aria-live="polite"></p></div>
 <fieldset class="field"><legend>¿Has venido antes al salón? <small>(opcional)</small></legend><div class="opts">{radio('cliente','Es mi primera vez')}{radio('cliente','Ya soy clienta')}</div></fieldset>
 <div class="field"><label class="check"><input type="checkbox" id="rconsentimiento" name="consentimiento" value="si" aria-describedby="e-rconsentimiento"><span>He leído el <a href="{L('legal')}#privacidad" target="_blank" rel="noopener">aviso de privacidad</a> y acepto que Catta Nails 29 trate mis datos para gestionar mi cita. *</span></label><p class="err" id="e-rconsentimiento" aria-live="polite"></p></div>
+<p class="hint-s punt2">⏰ Llega puntual: Pilar trabaja con horarios justos y, si llegas tarde, puede que no pueda atenderte. Te recordará la cita el día antes.</p>
 <div class="actions"><button type="button" class="fbtn ghost" id="rback">Atrás</button><button type="submit" class="fbtn" id="rsend">Reservar mi hora</button></div>
 </div></form>
 <div class="fb-panel" id="rfallback" hidden><h3 id="rfbHead" tabindex="-1" style="font-size:30px">No pudimos enviarla desde aquí</h3>
@@ -425,7 +427,8 @@ def make(mode):
 <p id="okMsg">Tu solicitud de cita ya está con Pilar. Todavía no es una cita confirmada: ella te escribirá con la hora exacta.</p>
 <p id="okDet" style="font-size:18px;font-weight:600" hidden></p>
 <p id="okCode" style="font-size:15px;color:var(--muted)" hidden>Tu código: <b id="okCodeV"></b></p>
-<div class="ctas" style="justify-content:center"><a class="pill solid glow" id="okManage" href="{L('manage')}" hidden>Cambiar o cancelar mi cita</a><a class="pill" id="okIcs" href="#" hidden>Añadir al calendario</a>{('<a class="pill wa" id="okWa" href="'+wa('Hola Pilar, acabo de reservar una cita en la web.')+'" target="_blank" rel="noopener" data-evt="wa_click">Escribir a Pilar por WhatsApp</a>') if WAN else ''}<a class="pill" href="{DM}" target="_blank" rel="noopener" data-evt="dm_click">Escribir por Instagram</a><a class="pill" href="{L('home')}">Volver al inicio</a></div></div></div></main>
+{('<div class="wastep"><p><b>Último paso:</b> envía tu reserva a Pilar por WhatsApp. El mensaje ya va escrito, solo dale a enviar.</p><a class="pill wa solid big" id="okWa" href="'+wa('Hola Pilar, acabo de reservar una cita en la web.')+'" target="_blank" rel="noopener" data-evt="wa_aviso_reserva">'+WAI+'Enviar mi reserva a Pilar</a></div>') if WAN else ''}
+<div class="ctas" style="justify-content:center"><a class="pill solid" id="okManage" href="{L('manage')}" hidden>Cambiar o cancelar mi cita</a><a class="pill" id="okIcs" href="#" hidden>Añadir al calendario</a><a class="pill" href="{DM}" target="_blank" rel="noopener" data-evt="dm_click">Escribir por Instagram</a><a class="pill" href="{L('home')}">Volver al inicio</a></div></div></div></main>
 {footer()}"""
     out['bookok'] = page('bookok', 'Reserva recibida | Catta Nails 29', 'Tu reserva de cita en Catta Nails 29: consulta la hora, añádela a tu calendario o cancélala.', bok, noindex=True)
 
@@ -472,6 +475,7 @@ def make(mode):
     thanks = f'''{header('form')}
 <main id="main"><div class="wrap center"><div><svg class="tick" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26.5"/><path d="M16 29l8 8 16-17"/></svg><span class="eyebrow">Solicitud recibida</span><h1 style="margin-top:12px">Gracias. <em>Pilar te contactará.</em></h1>
 <p>Pilar revisará tu solicitud y te escribirá por teléfono o Instagram. Mientras tanto, puedes ver sus trabajos.</p>
+{('<div class="wastep" id="thWa" hidden><p><b>Último paso, <span id="thName"></span>:</b> envía tus datos a Pilar por WhatsApp para que te cuente fechas y precio. El mensaje ya va escrito.</p><a class="pill wa solid big" id="thWaBtn" href="'+wa('Hola Pilar, acabo de pedir plaza en el curso de uñas.')+'" target="_blank" rel="noopener" data-evt="wa_aviso_curso">'+WAI+'Enviar mis datos a Pilar</a></div>') if WAN else ''}
 <div class="ctas" style="justify-content:center"><a class="pill solid" href="{L('home')}">Volver al inicio</a><a class="pill" href="{IG}" target="_blank" rel="noopener">Ver Instagram</a></div></div></div></main>
 {footer()}'''
     out['thanks'] = page('thanks', 'Solicitud recibida | Catta Nails 29', 'Gracias por tu solicitud. Pilar la revisará y te contactará.', thanks, noindex=True)
