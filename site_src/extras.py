@@ -10,6 +10,7 @@ shutil.copytree(DIST, SITE); os.makedirs(os.path.join(DOCS, 'legal'))
 W = lambda p, s: open(p, 'w', encoding='utf-8').write(textwrap.dedent(s).lstrip('\n'))
 
 # ---------- SEO técnico ----------
+DOMX = os.environ.get('SITE_DOMAIN', 'https://cattanails.netlify.app').rstrip('/')
 W(os.path.join(SITE, 'sitemap.xml'), '''
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -23,9 +24,12 @@ W(os.path.join(SITE, 'sitemap.xml'), '''
 W(os.path.join(SITE, 'robots.txt'), '''
 User-agent: *
 Allow: /
+Disallow: /admin
 
 Sitemap: __DOMINIO__/sitemap.xml
 ''')
+for _f in ('sitemap.xml', 'robots.txt'):
+    _p = os.path.join(SITE, _f); _t = open(_p, encoding='utf-8').read().replace('__DOMINIO__', DOMX); open(_p, 'w', encoding='utf-8').write(_t)
 W(os.path.join(SITE, 'site.webmanifest'), '''
 {"name":"Catta Nails 29","short_name":"Catta Nails","lang":"es-ES","start_url":"/","display":"standalone","background_color":"#fff8f6","theme_color":"#560d2b",
  "icons":[{"src":"/img/icon-192.png","sizes":"192x192","type":"image/png"},{"src":"/img/icon-512.png","sizes":"512x512","type":"image/png"}]}
@@ -39,7 +43,14 @@ W(os.path.join(SITE, '_headers'), '''
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
   Cross-Origin-Opener-Policy: same-origin
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://jqfjoclxtsonsqurfpqq.supabase.co; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://sleckhpzbqbwlvqevtbc.supabase.co; connect-src 'self' https://sleckhpzbqbwlvqevtbc.supabase.co; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
+
+/admin
+  Cache-Control: no-store
+  X-Robots-Tag: noindex, nofollow
+
+/admin.js
+  Cache-Control: no-cache
 
 /img/*
   Cache-Control: public, max-age=31536000, immutable
@@ -51,6 +62,7 @@ W(os.path.join(SITE, '_headers'), '''
   Cache-Control: public, max-age=86400
 ''')
 W(os.path.join(SITE, '_redirects'), '''
+/panel      /admin  301
 /curso      /formacion  301
 /cursos     /formacion  301
 /reserva    /reservar  301
@@ -158,7 +170,11 @@ W(os.path.join(DOCS, 'PENDIENTES.md'), '''
 
 ## Datos del negocio
 - [ ] Dirección exacta, horario y teléfono (hoy solo dice "Alcantarilla, Murcia").
-- [ ] **Número de WhatsApp de Pilar**: hoy el botón usa un número de EJEMPLO (34600000000) a petición de Andrés. Reemplazarlo antes de publicar: `WA_NUMBER=34XXXXXXXXX python3 site_src/build.py`.\n- [ ] **Confirmar el horario de ejemplo cargado en la agenda (lun-vie 10-14 y 16-20, sáb 10-14), las duraciones y el límite de cancelación de 4 h.** Ver `AGENDA.md`. No publicar sin esto.
+- [x] Número de WhatsApp: +34 602 44 71 02 (en todos los botones; se puede cambiar desde el panel, «Mi web» → Horario).
+- [ ] **Confirmar el horario de ejemplo de la agenda (lun-vie 10-14 y 16-20, sáb 10-14), las duraciones y la cancelación hasta 4 h antes.** Se cambia en el panel («Mi web»). No publicar sin esto.
+- [ ] **Dirección de la web** en el panel («Mi web» → Textos → Dirección de tu web), para que los enlaces de los mensajes de WhatsApp funcionen.
+- [ ] Correo de Pilar para invitarla al panel («Mi web» → Quién puede entrar).
+- [ ] En Supabase (proyecto `catta-nails`) → Authentication → URL Configuration: poner la dirección de la web como Site URL y añadir `https://TU-DOMINIO/admin` en Redirect URLs (para los correos de confirmar acceso y recuperar contraseña).
 - [ ] Servicios reales del salón y **precios** (hoy: Manicura, Uñas con diseño y Mantenimiento, todos "Precio al consultar"; las categorías salen de lo que se ve en las fotos).
 - [ ] Del curso "Inicio en el mundo de las uñas": temario, duración, fechas, precio, plazas por grupo y qué incluye. Hoy la web dice que Pilar lo confirma al contactar.
 - [ ] Si hay **otros cursos**: el formulario tiene la opción "otros cursos o formación personalizada"; añadir cada curso como opción y como página.
@@ -217,33 +233,91 @@ W(os.path.join(DOCS, 'README.md'), '''
 - `sitio/`  carpeta para publicar (Netlify u otro hosting estático).
 - `docs/LANZAMIENTO.md`  pasos de despliegue, Search Console, Google Business y seguimiento.
 - `docs/SEGURIDAD.md`  Cloudflare, límites, plan de respuesta.
-- `docs/AGENDA.md`  reservas del salón, WhatsApp directo y camino a Baltium Agenda.\n- `docs/PENDIENTES.md`  lo que falta que entreguen Pilar o Andrés.
+- `docs/PANEL.md`  cómo entrar y usar el panel de administración.\n- `docs/WHATSAPP.md`  mensajes automáticos y lo que se encontró en el Drive.\n- `docs/AGENDA.md`  reservas del salón.\n- `docs/PENDIENTES.md`  lo que falta que entreguen Pilar o Andrés.
 - `docs/keywords.csv`  palabras clave con estimaciones marcadas.
 - `docs/legal/compliance.md`  matriz legal adaptada a España (requiere abogado).
 - `docs/set-domain.sh`  pone el dominio real en canónicas, sitemap y robots.
 ''')
 
 W(os.path.join(DOCS, 'AGENDA.md'), '''
-# Reservas del salón: Baltium Agenda conectada (horas reales, cancelar y liberar)
+# Reservas del salón: agenda propia de Catta Nails (horas reales, cancelar y liberar)
 
 ## Cómo funciona
-- `/reservar` usa la agenda de Baltium Agenda que ya vive en tu Supabase (organización **Catta Nails 29**, slug `catta-nails-29`, zona Europe/Madrid, EUR). El cliente elige servicio, día y una **hora libre real**; al reservar, la hora se bloquea al instante (la base de datos impide dobles reservas aunque dos personas pulsen a la vez).
-- El cliente recibe un código `CN-XXXX` y un enlace privado a `/mi-cita` (el token va en la parte `#` de la URL, no se envía a ningún servidor de analítica). Desde ahí **cancela**: la cita pasa a `cancelada` y la hora **vuelve a estar libre** al momento. Se puede cancelar hasta `cancel_limit_hours` (hoy 4 h) antes; después se le invita a escribir a Pilar. Para cambiar la hora: cancela y reserva otra.
-- Pilar recibe además un aviso por correo (Netlify Forms, formulario `reserva`). Las citas también aparecen en el panel de Baltium Agenda (tu usuario es owner de la organización).
-- Si la agenda no responde (sin internet, mantenimiento), el formulario cae a modo «franja» (mañana/tarde) y Pilar confirma, sin perder el cliente.
-
-## Qué se creó en Supabase (proyecto jqfjoclxtsonsqurfpqq)
-- Organización, profesional **Pilar** y 4 servicios (Manicura 60 min, Uñas con diseño 90, Mantenimiento 60, Consulta y consejo 30).
-- 5 funciones públicas, solo para Catta: `catta_services`, `catta_slots(servicio, día)`, `catta_book(datos)`, `catta_get(código, token)`, `catta_cancel(código, token)`. Validan nombre, teléfono, consentimiento, hora libre y límites (máx. 3 intentos por hora y 2 citas activas por teléfono). El token se guarda con hash SHA-256. No hay acceso directo a las tablas desde el navegador (RLS).
-- Probado con pruebas revertidas: reservar, bloquear la hora, segunda reserva rechazada, cancelar con token malo (rechazado), cancelar bien y liberar la hora, segunda cancelación rechazada.
+- `/reservar` usa la base de datos propia **catta-nails** (Supabase `sleckhpzbqbwlvqevtbc`, Europe/Madrid, EUR). La clienta elige servicio, día y una **hora libre real**; al reservar, la hora se bloquea al instante (la base de datos impide dobles reservas aunque dos personas pulsen a la vez).
+- Recibe un código `CN-XXXX` y un enlace privado a `/mi-cita` para **cancelar**: la hora vuelve a estar libre al momento (hasta 4 h antes, configurable en el panel).
+- Cada reserva aparece en el panel (`/admin`) y prepara su confirmación y su recordatorio de WhatsApp. Pilar recibe además un aviso por correo (Netlify Forms).
+- Si la agenda no responde, el formulario pide solo mañana o tarde y Pilar confirma, sin perder a la clienta.
+- El proyecto anterior (`jqfjoclxtsonsqurfpqq`, Zarume y Baltium Agenda) no se modificó; la web ya no lo usa. Las funciones `catta_*` que se crearon ahí antes siguen existiendo; se pueden borrar cuando Andrés lo decida.
 
 ## ⚠ Datos provisionales que Pilar debe confirmar ANTES de publicar
-Horario cargado de ejemplo: lunes a viernes 10:00-14:00 y 16:00-20:00, sábado 10:00-14:00, intervalos de 30 min, aviso mínimo 2 h, hasta 60 días, cancelación hasta 4 h antes. Duraciones de ejemplo. Se cambian en el panel de Baltium Agenda (profesionales y servicios) o con SQL en `professionals.working_hours` y `services.duration_min`. Mientras no los confirme, no publiques la web: los clientes verían horas que Pilar quizá no atiende.
-Para bloquear vacaciones o ausencias: tabla `time_off`.
+Horario cargado de ejemplo: lunes a viernes 10:00-14:00 y 16:00-20:00, sábado 10:00-14:00, intervalos de 30 min, aviso mínimo 2 h, hasta 60 días, cancelación hasta 4 h antes. Duraciones de ejemplo. Se cambian en el panel: «Mi web» → Servicios y Horario. Mientras no los confirme, no publiques la web: los clientes verían horas que Pilar quizá no atiende.
+Para vacaciones o ausencias: panel → Agenda → «Bloquear días u horas».
 
 ## Siguiente nivel (cuando haya WhatsApp)
 Modo `link` de Baltium Agenda: el cliente escribe por WhatsApp y el bot responde con el enlace de reserva; recordatorios por email/push gratis; lista de espera y recuperación de cupos al cancelar; precios por servicio.
 ''')
+
+W(os.path.join(DOCS, 'PANEL.md'), '''
+# Panel de administración de Catta Nails 29
+
+Dirección: `https://TU-DOMINIO/admin` (también `/panel`). No aparece en Google (noindex y bloqueado en robots).
+
+## Dónde viven los datos
+Proyecto Supabase propio **catta-nails** (`sleckhpzbqbwlvqevtbc`, región París). Es independiente: el proyecto de Zarume y Baltium Agenda no se tocó.
+Las reservas de la web, las interesadas del curso, las clientas, las finanzas, los textos editables y la cola de WhatsApp están ahí.
+Las tablas no se pueden leer con la clave pública: todo pasa por funciones que comprueban si quien llama es administradora.
+El SQL completo está en `docs/supabase/01_catta_base.sql` y la función de envío en `docs/supabase/functions/wa-send/index.ts`.
+
+## Primer acceso
+1. Abre `/admin` → «Primera vez: crear acceso» con **andrezbalanta@gmail.com** y una contraseña.
+2. Confirma el correo que te envía Supabase y vuelve a `/admin` → «Entrar». Ese primer correo queda como administrador.
+3. En «Mi web» → «Quién puede entrar», invita el correo de Pilar. Ella entra con «Primera vez: crear acceso» usando ese correo.
+Antes, en Supabase → Authentication → URL Configuration: Site URL = tu dominio y Redirect URLs = `https://TU-DOMINIO/admin`.
+
+## Qué hace cada sección
+- **Inicio**: ingresos, gastos y lo que queda del mes; citas de hoy con botones «Hecha y cobrar», «No vino», «Cancelar» y WhatsApp.
+- **Agenda**: semana completa, nueva cita a mano (con confirmación y recordatorio por WhatsApp), bloquear vacaciones u horas (desaparecen de la web).
+- **Clientas**: historial, visitas, cuánto ha gastado, veces que no vino, notas privadas.
+- **Formación**: personas que piden plaza en el curso o se apuntan a la lista; nivel de interés calculado por sus respuestas, estado (nueva, contactada, interesada, inscrita, descartada), notas, WhatsApp con un toque, registrar el pago y descargar en Excel (CSV).
+- **Finanzas**: ingresos y gastos por periodo, por categoría y forma de pago (efectivo, tarjeta, Bizum, transferencia), descarga en Excel.
+- **WhatsApp**: mensajes preparados solos (confirmación, recordatorio 24 h antes, gracias, vuelve a reservar a los 21 días, respuesta al curso y a la lista), textos editables y envío automático.
+- **Mi web**: textos (aviso arriba, frase del inicio, precios, próximo grupo del curso, horario, dirección), subir fotos de trabajos a la galería con su botón «Quiero este», ocultar fotos, servicios y duraciones, horario de reservas, aviso mínimo, cancelación, número de WhatsApp y accesos.
+
+## Importante sobre Google
+Los textos que cambias en el panel se ven al instante para las visitas, pero Google lee el texto original del HTML. Si cambias algo importante para el posicionamiento (por ejemplo, los precios), pídelo también en el código en la próxima actualización.
+''')
+
+W(os.path.join(DOCS, 'WHATSAPP.md'), '''
+# WhatsApp: qué funciona hoy y cómo dejarlo 100 % automático
+
+## Hoy (gratis, sin configurar nada)
+- Botones de WhatsApp de la web con el número **+34 602 44 71 02**.
+- Cada reserva, solicitud del curso o cita marcada como hecha **prepara sola** su mensaje en el panel (sección WhatsApp). Pilar toca «Enviar», se abre su WhatsApp con el texto escrito y solo le da a enviar.
+- Si una clienta cancela desde su enlace, sus recordatorios se anulan solos.
+
+## Automático de verdad (sin tocar nada)
+WhatsApp solo permite mensajes automáticos que empiecen las empresas mediante su **API oficial (WhatsApp Cloud API de Meta)** y con **plantillas aprobadas**. Esas plantillas tienen coste por mensaje según el país y la categoría: revisar la tarifa oficial de Meta para España antes de activarlo.
+Ya está todo preparado en el proyecto `catta-nails`:
+- Función `wa-send` desplegada y programada cada 5 minutos. Hoy no envía nada porque está desactivada.
+Pasos para activarlo:
+1. Crear una app en developers.facebook.com con el producto WhatsApp y registrar el número de Pilar (ideal en modo coexistencia, para seguir usando la app WhatsApp Business en el móvil).
+2. Crear y aprobar plantillas de utilidad en el WhatsApp Manager (por ejemplo `confirmacion_cita` con variables {{1}} nombre, {{2}} servicio, {{3}} fecha, {{4}} hora).
+3. En Supabase → Edge Functions → Secrets: `WA_TOKEN` (token permanente de usuario del sistema) y `WA_PHONE_ID` (ID del número). Nunca pegar el token en el chat ni en el código.
+4. En el panel → WhatsApp → «Envío automático»: escribir el nombre de cada plantilla y sus variables en orden (`nombre, servicio, fecha, hora`) y activar.
+Los mensajes sin plantilla siguen apareciendo en el panel para enviarlos con un toque.
+
+## Lo que encontré en tu Drive y qué conviene
+| Archivo | Qué es | ¿Usarlo para Catta? |
+|---|---|---|
+| Plantillas n8n «Building Your First WhatsApp Chatbot» y «Respond to WhatsApp Messages with AI Like a Pro!» | Flujos de n8n con el disparador y el nodo **oficiales** de WhatsApp (Cloud API) y un agente de IA | Sí, como siguiente paso: un asistente que responda preguntas (precios, horario, curso) y mande el enlace de reserva. Usa la misma cuenta de Meta del paso anterior |
+| Carpeta «Automatización de ventas con ManyChat para Facebook y WhatsApp» | Curso de ManyChat (enlace a MEGA) | Opción de pago sin programar para respuestas automáticas en Instagram y WhatsApp |
+| «Curso de copywriting para WhatsApp Business» (plantillas de módulos 1 a 10) | Organizar contactos con etiquetas y escribir mensajes que venden | Sí, para los textos de los mensajes y las etiquetas de WhatsApp Business |
+| «Cómo automatizar la gestión de mensajes en WhatsApp con MessageBird» | Proveedor intermediario | No hace falta: el panel conecta directo con Meta, sin comisión de intermediario |
+| whaticket.zip, «CRM de Redes Sociales» (ElizaBot y otros con «WhatsApp QR») y «AutoResponder for WhatsApp Mod.apk» | Conexiones **no oficiales** por código QR y una app modificada | **No usar**: incumplen los términos de WhatsApp y Meta puede bloquear el número de Pilar. La app modificada además es un riesgo de seguridad |
+''')
+
+import shutil as _sh
+_sh.copytree(os.path.join(ROOT, 'admin'), os.path.join(DOCS, 'supabase'))
 
 # ---------- zip ----------
 zp = os.path.join(ROOT, 'out', 'catta-nails-paquete.zip')

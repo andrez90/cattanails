@@ -2,8 +2,11 @@
 
 ## Datos del negocio
 - [ ] Dirección exacta, horario y teléfono (hoy solo dice "Alcantarilla, Murcia").
-- [ ] **Número de WhatsApp de Pilar**: hoy el botón usa un número de EJEMPLO (34600000000) a petición de Andrés. Reemplazarlo antes de publicar: `WA_NUMBER=34XXXXXXXXX python3 site_src/build.py`.
-- [ ] **Confirmar el horario de ejemplo cargado en la agenda (lun-vie 10-14 y 16-20, sáb 10-14), las duraciones y el límite de cancelación de 4 h.** Ver `AGENDA.md`. No publicar sin esto.
+- [x] Número de WhatsApp: +34 602 44 71 02 (en todos los botones; se puede cambiar desde el panel, «Mi web» → Horario).
+- [ ] **Confirmar el horario de ejemplo de la agenda (lun-vie 10-14 y 16-20, sáb 10-14), las duraciones y la cancelación hasta 4 h antes.** Se cambia en el panel («Mi web»). No publicar sin esto.
+- [ ] **Dirección de la web** en el panel («Mi web» → Textos → Dirección de tu web), para que los enlaces de los mensajes de WhatsApp funcionen.
+- [ ] Correo de Pilar para invitarla al panel («Mi web» → Quién puede entrar).
+- [ ] En Supabase (proyecto `catta-nails`) → Authentication → URL Configuration: poner la dirección de la web como Site URL y añadir `https://TU-DOMINIO/admin` en Redirect URLs (para los correos de confirmar acceso y recuperar contraseña).
 - [ ] Servicios reales del salón y **precios** (hoy: Manicura, Uñas con diseño y Mantenimiento, todos "Precio al consultar"; las categorías salen de lo que se ve en las fotos).
 - [ ] Del curso "Inicio en el mundo de las uñas": temario, duración, fechas, precio, plazas por grupo y qué incluye. Hoy la web dice que Pilar lo confirma al contactar.
 - [ ] Si hay **otros cursos**: el formulario tiene la opción "otros cursos o formación personalizada"; añadir cada curso como opción y como página.

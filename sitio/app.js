@@ -180,8 +180,13 @@ if(f){
     var ig=f.elements.instagram.value.trim();fd.set('instagram',ig.charAt(0)==='@'?ig:'@'+ig);
     var body=new URLSearchParams();fd.forEach(function(v,k){body.append(k,v)});
     var ctl='AbortController' in window?new AbortController():null;var to=setTimeout(function(){ctl&&ctl.abort()},12000);
-    fetch(f.getAttribute('data-post')||'/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString(),signal:ctl?ctl.signal:undefined})
-      .then(function(r){clearTimeout(to);if(!r.ok)throw new Error('http '+r.status);track('form_submit');location.href=thanks})
+    var lv=interes(),ans={objetivo:pick('objetivo'),experiencia:pick('experiencia'),inicio:pick('inicio'),presencial:pick('presencial'),inversion:pick('inversion')};
+    var toDb=rpc('catta_lead',{p:{kind:'curso',name:f.elements.nombre.value.trim(),phone:f.elements.telefono.value.trim(),instagram:fd.get('instagram'),answers:ans,score:lv==='alto'?90:lv==='medio'?60:30,
+      newsletter:!!(f.elements.novedades&&f.elements.novedades.checked),consent:true,consent_text:fd.get('texto_consentimiento'),policy_version:fd.get('politica_version')}})
+      .then(function(r){if(!r||!r.ok)throw new Error(r&&r.error||'db');return true});
+    var toMail=window.__demoRpc?Promise.reject(new Error('demo')):fetch(f.getAttribute('data-post')||'/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString(),signal:ctl?ctl.signal:undefined})
+      .then(function(r){if(!r.ok)throw new Error('http '+r.status);return true});
+    toDb.catch(function(){return toMail}).then(function(){clearTimeout(to);toMail.catch(function(){});track('form_submit');setTimeout(function(){location.href=thanks},400)})
       .catch(function(){clearTimeout(to);btn.disabled=false;btn.textContent='Enviar mi solicitud';fallback()});
   });
   var cp=$('#fbCopy');
@@ -233,10 +238,13 @@ if(lf){var lt0=Date.now();
     function done(){lf.querySelectorAll('.field,.actions').forEach(function(x){x.hidden=true});msg.hidden=false;msg.className='fmsg';msg.textContent='Listo, '+$('#lnombre').value.trim()+'. Pilar te avisará cuando abra plazas. Mientras tanto, síguela en Instagram.';track('lista_submit')}
     if(lf.elements['bot-field'].value||Date.now()-lt0<2500){done();return}
     btn.disabled=true;btn.textContent='Enviando…';
-    if(window.__demoRpc){setTimeout(done,300);return}
-    var fd=new FormData(lf);fd.set('politica_version',lf.getAttribute('data-policy'));fd.set('texto_consentimiento',$('#lconsent').closest('label').textContent.replace(/\s+/g,' ').trim());fd.set('fecha_cliente',new Date().toISOString());
+    var fd=new FormData(lf);
+    var dbl=rpc('catta_lead',{p:{kind:'lista',name:$('#lnombre').value.trim(),contact:$('#lcontacto').value.trim(),consent:true,newsletter:true,policy_version:lf.getAttribute('data-policy'),consent_text:$('#lconsent').closest('label').textContent.replace(/\s+/g,' ').trim()}})
+      .then(function(r){if(!r||!r.ok)throw 0});
+    if(window.__demoRpc){dbl.then(done,function(){btn.disabled=false;btn.textContent='Avisadme'});return}fd.set('politica_version',lf.getAttribute('data-policy'));fd.set('texto_consentimiento',$('#lconsent').closest('label').textContent.replace(/\s+/g,' ').trim());fd.set('fecha_cliente',new Date().toISOString());
     var body=new URLSearchParams();fd.forEach(function(v,k){body.append(k,v)});
-    fetch(lf.getAttribute('data-post')||'/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()}).then(function(r){if(!r.ok)throw 0;done()}).catch(function(){btn.disabled=false;btn.textContent='Avisadme';msg.hidden=false;msg.className='fmsg bad';msg.textContent='No pudimos apuntarte desde aquí. Escríbele a Pilar por Instagram (@catta_nails29) y dile que quieres saber las próximas fechas.'})
+    var mail=fetch(lf.getAttribute('data-post')||'/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()}).then(function(r){if(!r.ok)throw 0});
+    dbl.catch(function(){return mail}).then(function(){mail.catch(function(){});done()}).catch(function(){btn.disabled=false;btn.textContent='Avisadme';msg.hidden=false;msg.className='fmsg bad';msg.textContent='No pudimos apuntarte desde aquí. Escríbele a Pilar por Instagram (@catta_nails29) y dile que quieres saber las próximas fechas.'})
   })}
 var rf=$('#reservaForm');
 if(rf){
@@ -457,4 +465,21 @@ if(GA){
   var pref=$('#prefCookies');if(pref)pref.addEventListener('click',function(e){e.preventDefault();try{localStorage.removeItem(KEY)}catch(x){}if(ban)ban.hidden=false});
 }
 $$('[data-year]').forEach(function(n){n.textContent=new Date().getFullYear()});
+/* ---------- contenido editable desde el panel (si falla, la web se queda con los textos originales) ---------- */
+rpc('catta_content').then(function(r){
+  if(!r||!r.c)return;var c=r.c;
+  $$('[data-k]').forEach(function(el){var v=c[el.getAttribute('data-k')];if(typeof v==='string'&&v.trim()){el.textContent=v.trim();el.hidden=false}});
+  if(r.wa&&/^\d{9,15}$/.test(r.wa))$$('a[href^="https://wa.me/"]').forEach(function(a){a.href=a.href.replace(/wa\.me\/\d+/,'wa.me/'+r.wa)});
+  var gal=$('#gal');if(!gal)return;
+  var hid=Array.isArray(c['gal.ocultar'])?c['gal.ocultar']:[];
+  $$('figure',gal).forEach(function(fg){var s=$('strong',fg);if(s&&hid.indexOf(s.textContent)>=0)fg.remove()});
+  var ex=Array.isArray(c['gal.extra'])?c['gal.extra']:[],ok=(SBU||'').replace(/\/$/,'')+'/storage/v1/object/public/media/';
+  var tpl=$('figure a',gal),book=tpl?tpl.getAttribute('href').split('#')[0]:'reservar.html';
+  ex.slice(0,40).forEach(function(g){if(!g||typeof g.url!=='string'||!(g.url.indexOf(ok)===0||(window.__demoRpc&&/^data:image\//.test(g.url))))return;
+    var nm=String(g.nombre||'Diseño').slice(0,40),fg=document.createElement('figure');fg.setAttribute('data-c',String(g.estilos||'').replace(/[^a-z ]/g,''));
+    var im=document.createElement('img');im.src=g.url;im.alt=nm;im.loading='lazy';im.width=560;im.height=700;
+    var cap=document.createElement('figcaption'),st=document.createElement('strong');st.textContent=nm;
+    var a=document.createElement('a');a.className='pill solid';a.href=book+'#d='+encodeURIComponent(nm);a.setAttribute('data-evt','diseno_click');a.textContent='Quiero este';
+    cap.appendChild(st);cap.appendChild(a);fg.appendChild(im);fg.appendChild(cap);gal.insertBefore(fg,gal.firstChild)});
+}).catch(function(){});
 })();

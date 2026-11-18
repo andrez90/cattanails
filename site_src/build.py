@@ -28,14 +28,14 @@ JS = open(os.path.join(SRC, 'app.js')).read()
 JSART = JS.replace('/* ---------- reservas del salón', open(os.path.join(SRC, 'demo.js')).read() + '\n/* ---------- reservas del salón', 1)
 
 BRAND = 'Catta Nails 29'
-DOM = '__DOMINIO__'
+DOM = os.environ.get('SITE_DOMAIN', 'https://cattanails.netlify.app').rstrip('/')  # dominio publicado en Netlify; para uno propio: SITE_DOMAIN=https://tudominio.es
 IG = 'https://www.instagram.com/catta_nails29/'
 DM = 'https://ig.me/m/catta_nails29'
 TALLY = 'https://tally.so/r/wA1aPo'
 POLICY_VERSION = 'v1-2026-11'
-SB_URL = 'https://jqfjoclxtsonsqurfpqq.supabase.co'
-SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxZmpvY2x4dHNvbnNxdXJmcHFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyNDYyMTUsImV4cCI6MjEwNzgyMjIxNX0._vPqRzkgTnOo1ERl4Lqqze-PFlZSfdMgz0wJW-P3izw'  # clave pública (anon): segura en el navegador, el acceso real lo limitan RLS y las funciones catta_*
-WA_PLACEHOLDER = '34600000000'  # NÚMERO DE EJEMPLO: reemplazar por el real con WA_NUMBER=...
+SB_URL = 'https://sleckhpzbqbwlvqevtbc.supabase.co'  # proyecto Supabase propio de Catta Nails
+SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNsZWNraHB6YnFid2x2cWV2dGJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ5NDk3ODYsImV4cCI6MjExMDUyNTc4Nn0.qUC3EIjda94GwfYW6IKRaOzUr9XpfL3fLXnkyGBMJek'  # clave pública (anon)  # clave pública (anon): segura en el navegador, el acceso real lo limitan RLS y las funciones catta_*
+WA_PLACEHOLDER = '34602447102'  # WhatsApp de Pilar (+34 602 44 71 02). También se cambia desde el panel.
 WAN = re.sub(r'\D', '', os.environ.get('WA_NUMBER', WA_PLACEHOLDER))  # WhatsApp de Pilar, solo dígitos con prefijo (ej. 34600123456). Vacío = botón oculto.
 
 PAGES = {  # clave: (url dist, archivo art, archivo dist)
@@ -47,6 +47,7 @@ PAGES = {  # clave: (url dist, archivo art, archivo dist)
     'book': ('/reservar', 'reservar.html', 'reservar.html'),
     'bookok': ('/reserva-enviada', 'reserva-enviada.html', 'reserva-enviada.html'),
     'manage': ('/mi-cita', 'mi-cita.html', 'mi-cita.html'),
+    'admin': ('/admin', 'admin.html', 'admin.html'),
 }
 
 def lens(title, desc):
@@ -97,7 +98,7 @@ def make(mode):
             c = ' aria-current="page"' if cur == k else ''
             return f'<a href="{L(k)}"{c}>{label}</a>'
         ext = ' target="_blank" rel="noopener"' if book_href.startswith('http') else ''
-        return f'''<a class="skip" href="#main">Saltar al contenido</a><div id="prog" aria-hidden="true"></div>
+        return f'''<a class="skip" href="#main">Saltar al contenido</a><div id="prog" aria-hidden="true"></div><p class="aviso" data-k="site.aviso" role="status" hidden></p>
 <header class="top"><div class="wrap bar">
 <a class="logo" href="{L('home')}" aria-label="Catta Nails 29, inicio">CATTA<small>NAILS 29</small></a>
 <nav class="tabs" aria-label="Secciones del sitio">{tab('home','Salón')}<a class="tab-x" href="{L('home')}#galeria">Trabajos</a>{tab('form','Formación')}</nav>
@@ -127,7 +128,7 @@ def make(mode):
     def footer():
         return f'''<div class="wrap"><footer class="foot">
 <div class="fgrid"><div><a class="logo" href="{L('home')}">CATTA<small>NAILS 29</small></a><p style="color:var(--muted);margin:10px 0 0;max-width:34ch;font-size:14px">Uñas hechas a mano y formación de manicura en Alcantarilla, Murcia.</p></div>
-<nav class="flinks" aria-label="Pie de página"><a href="{L('home')}">Salón</a><a href="{L('form')}">Formación</a><a href="{L('book')}">Reservar cita</a><a href="{L('svc')}">Uñas en Alcantarilla</a><a href="{IG}" target="_blank" rel="noopener">Instagram</a><a href="{L('legal')}">Aviso legal y privacidad</a><a href="{L('legal')}#cookies">Cookies</a></nav></div>
+<nav class="flinks" aria-label="Pie de página"><a href="{L('home')}">Salón</a><a href="{L('form')}">Formación</a><a href="{L('book')}">Reservar cita</a><a href="{L('svc')}">Uñas en Alcantarilla</a><a href="{IG}" target="_blank" rel="noopener">Instagram</a><a href="{L('legal')}">Aviso legal y privacidad</a><a href="{L('legal')}#cookies">Cookies</a><a href="{L('admin')}" rel="nofollow">Acceso Pilar</a></nav></div>
 <small>© <span data-year>2026</span> Catta Nails 29 · Alcantarilla, Murcia (España)</small></footer></div>
 <div class="consent" id="consent" hidden role="dialog" aria-label="Preferencias de cookies"><p>Usamos cookies de analítica solo si las aceptas. Puedes rechazarlas y seguir navegando igual.</p><div class="row"><button type="button" id="cAcc">Aceptar</button><button type="button" id="cRej">Rechazar</button><button type="button" id="cCfg">Solo necesarias</button></div></div>'''
 
@@ -170,9 +171,9 @@ def make(mode):
 <main id="main">
 <section class="hero"><span class="aur aur1" aria-hidden="true"></span><span class="aur aur2" aria-hidden="true"></span><div class="wrap hero-grid">
 <div class="hero-copy">
-<span class="hero-badge"><i></i>Reserva online · sin llamadas</span>
+<span class="hero-badge"><i></i><span data-k="site.hero_badge">Reserva online · sin llamadas</span></span>
 <h1><span class="mark"><i>C</i><i>A</i><i>T</i><i>T</i><i>A</i></span><span class="sub">Nails 29 · Uñas a mano alzada en Alcantarilla</span></h1>
-<p class="lead">Diseños que se ven bien y también duran, hechos por Pilar en su salón de Alcantarilla (Murcia). Elige tu hora libre en un minuto.</p>
+<p class="lead" data-k="site.hero_lead">Diseños que se ven bien y también duran, hechos por Pilar en su salón de Alcantarilla (Murcia). Elige tu hora libre en un minuto.</p>
 <div class="ctas"><a class="pill solid glow big" href="{L('book')}" data-evt="reserva_click">Reservar mi hora</a>{wabtn('Escribir por WhatsApp', solid=True)}</div>
 <p class="hero-note">Cancelas cuando quieras desde tu enlace · <a href="{L('form')}">¿Quieres aprender? Mira el curso</a></p>
 </div>
@@ -195,9 +196,9 @@ def make(mode):
 <div class="rv"><span class="eyebrow">Servicios del salón</span><h2 style="margin:10px 0 16px">Uñas con diseño, <em>sin complicaciones.</em></h2>
 <p>Elige lo que necesitas y reserva tu cita. Pilar te dice el precio y el tiempo antes de confirmarla.</p>
 <div class="ctas" style="margin-top:22px"><a class="pill solid" href="{L('svc')}">Ver servicios</a></div></div>
-<ul class="svc-list rv"><li><a href="{L('svc')}#manicura"><strong>Manicura</strong><small>Precio al consultar</small></a></li>
-<li><a href="{L('svc')}#diseno"><strong>Uñas con diseño</strong><small>Precio al consultar</small></a></li>
-<li><a href="{L('svc')}#mantenimiento"><strong>Mantenimiento</strong><small>Precio al consultar</small></a></li>
+<ul class="svc-list rv"><li><a href="{L('svc')}#manicura"><strong>Manicura</strong><small data-k="site.precio_manicura">Precio al consultar</small></a></li>
+<li><a href="{L('svc')}#diseno"><strong>Uñas con diseño</strong><small data-k="site.precio_diseno">Precio al consultar</small></a></li>
+<li><a href="{L('svc')}#mantenimiento"><strong>Mantenimiento</strong><small data-k="site.precio_mantenimiento">Precio al consultar</small></a></li>
 <li><a href="{L('form')}"><strong>Formación</strong><small>Curso presencial</small></a></li></ul></div></section>
 
 <section class="sec" id="pilar" style="padding-top:20px"><div class="wrap about">
@@ -223,7 +224,7 @@ def make(mode):
 
 <section class="sec" id="visita"><div class="wrap visit">{IM('visit','Puesto de trabajo del salón Catta Nails 29')}
 <div class="rv"><span class="eyebrow">La visita</span><h2>Un salón propio, <em>hecho con cariño.</em></h2>
-<div class="three"><div class="box"><h3>Dónde</h3><p>Alcantarilla, Murcia (España). Te damos la dirección exacta al confirmar tu cita.</p></div>
+<div class="three"><div class="box"><h3>Dónde</h3><p data-k="site.direccion">Alcantarilla, Murcia (España). Te damos la dirección exacta al confirmar tu cita.</p><p class="hor" data-k="site.horario" hidden></p></div>
 <div class="box"><h3>Cómo reservar</h3><p><a href="{L('book')}">Reserva tu cita en línea</a>{' o escríbele por WhatsApp' if WAN else ''}. También en Instagram: @catta_nails29.</p></div>
 <div class="box"><h3>Formación</h3><p>Los cursos son presenciales. <a href="{L('form')}">Rellena el formulario</a> y Pilar te contacta.</p></div></div></div></div></section>
 
@@ -275,6 +276,7 @@ def make(mode):
 <span class="eyebrow" style="color:var(--acad-muted)">Curso · Inicio en el mundo de las uñas</span>
 <h1 style="margin-top:12px">Curso de uñas desde cero <em>en Alcantarilla (Murcia)</em></h1>
 <p>Una formación pensada para mujeres que quieren empezar en el mundo de las uñas desde cero, aprender una nueva profesión, tener libertad económica y crear su propio camino. Pilar te acompaña paso a paso.</p>
+<p class="cinfo" data-k="site.curso_info" hidden></p>
 <div class="chips"><span>100 % presencial</span><span>Desde cero</span><span>Paso a paso</span><a href="#comunidad">Con comunidad ↓</a></div>
 <div class="ctas"><a class="pill solid glow" href="#solicitar" data-evt="solicitar_click">Solicitar mi plaza</a><a class="pill" href="{wa('Hola Pilar, quiero información sobre el curso.') if WAN else DM}" target="_blank" rel="noopener" data-evt="{'wa_click' if WAN else 'dm_click'}">Hablar con Pilar</a></div></div>
 <div class="arch">{IM('acad','Práctica de uñas durante la formación de Catta Nails 29',prio=True)}</div></div></section>
@@ -480,6 +482,18 @@ def make(mode):
 <div class="ctas" style="justify-content:center"><a class="pill solid" href="{L('home')}">Ir al inicio</a><a class="pill" href="{L('form')}">Ver el curso</a><a class="pill" href="{L('svc')}">Uñas en Alcantarilla</a></div></div></div></main>
 {footer()}'''
     out['404'] = page('thanks', 'Página no encontrada | Catta Nails 29', 'La página que buscas no existe. Vuelve al inicio, al curso o a los servicios del salón.', nf, noindex=True, canon=DOM + '/404')
+    # PANEL DE ADMINISTRACIÓN
+    acss = open(os.path.join(SRC, 'admin.css'), encoding='utf-8').read()
+    ajs = open(os.path.join(SRC, 'admin.js'), encoding='utf-8').read()
+    ademo = open(os.path.join(SRC, 'demo.js'), encoding='utf-8').read()
+    fonts = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=DM+Sans:wght@400;500;600;700&display=swap">'
+    out['admin'] = ('<!doctype html>\n<html lang="es-ES"><head>\n<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n' +
+        f'<title>Panel · Catta Nails 29</title><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#560d2b">'
+        f'<meta name="sb-url" content="{SB_URL}"><meta name="sb-key" content="{SB_KEY}"><meta name="site-url" content="{DOM}"><meta name="home-url" content="{L("home")}">' + fonts +
+        (f'<style>{acss}</style>' if art else '<link rel="stylesheet" href="/admin.css"><link rel="icon" href="/favicon.svg" type="image/svg+xml">') +
+        '\n</head><body>\n' +
+        '<div id="app"><p style="padding:24px">Cargando el panel…</p></div><div class="modal" id="modal" hidden role="dialog" aria-modal="true"></div><div class="toast" id="toast" role="status" aria-live="polite"></div>' +
+        (f'<script>{ademo}</script><script>{ajs}</script>' if art else '<script src="/admin.js" defer></script>') + '\n</body></html>')
     return out
 
 def write(base, files):
@@ -492,7 +506,7 @@ if __name__ == '__main__':
     for d in (dist, art):
         shutil.rmtree(d, ignore_errors=True); os.makedirs(d)
         shutil.copytree(os.path.join(ROOT, 'site', 'img'), os.path.join(d, 'img'))
-    names = {'home': 'index.html', 'form': 'formacion.html', 'svc': 'unas-alcantarilla.html', 'legal': 'aviso-legal-privacidad.html', 'thanks': 'gracias.html', 'book': 'reservar.html', 'bookok': 'reserva-enviada.html', 'manage': 'mi-cita.html', '404': '404.html'}
+    names = {'admin': 'admin.html', 'home': 'index.html', 'form': 'formacion.html', 'svc': 'unas-alcantarilla.html', 'legal': 'aviso-legal-privacidad.html', 'thanks': 'gracias.html', 'book': 'reservar.html', 'bookok': 'reserva-enviada.html', 'manage': 'mi-cita.html', '404': '404.html'}
     for mode, base in (('dist', dist), ('art', art)):
         pages = make(mode)
         write(base, {names[k]: v for k, v in pages.items()})
@@ -500,4 +514,5 @@ if __name__ == '__main__':
     shutil.copy(os.path.join(ROOT, 'site', 'favicon.svg'), dist)
     open(os.path.join(dist, 'styles.css'), 'w').write('/* Catta Nails 29 */\n[hidden]{display:none!important}\n' + CSS)
     open(os.path.join(dist, 'app.js'), 'w').write(JS)
+    shutil.copy(os.path.join(SRC, 'admin.js'), dist); shutil.copy(os.path.join(SRC, 'admin.css'), dist)
     print('ok', os.listdir(dist))
